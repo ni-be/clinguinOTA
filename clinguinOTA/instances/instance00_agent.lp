@@ -1,3 +1,3 @@
 % Instance information for the agent
-agent((1,1)).
+agent((0,1)).
 

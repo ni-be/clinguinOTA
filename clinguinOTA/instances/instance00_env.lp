@@ -1,3 +1,4 @@
+entrance((0,1)).
 
 % Cave the agent moves in 
 cave((1..2,1..2)).

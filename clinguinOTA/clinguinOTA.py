@@ -66,7 +66,7 @@ def debug(who):
 
 def clinota():
     ext_time = 0
-    horizon = 4
+    horizon = 1
     exploring = True
 
     while exploring:
@@ -75,14 +75,14 @@ def clinota():
             solver(ext_time, "agent", LOAD_AGENT, False)
             # somehow reduce agent_knowledge transferd to env to holds(T,in(agent,C)).
             solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
-        elif ext_time > 0:
-            working_knowledge = AGENT_KNOWLEDGE + CURRENT_LOCATION
-            print(ext_time)
-            solver(ext_time, "agent", LOAD_AGENT, working_knowledge)
-            solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
+        #elif ext_time > 0:
+        #    working_knowledge = AGENT_KNOWLEDGE + CURRENT_LOCATION
+        #    print(ext_time)
+        #    solver(ext_time, "agent", LOAD_AGENT, working_knowledge)
+        #    solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
 
         ext_time += 1
-        print("AGENT")
+        #print("AGENT")
         debug("agent")
         print("ENV")
         debug("env")
