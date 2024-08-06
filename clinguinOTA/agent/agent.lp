@@ -9,7 +9,7 @@ observed(T, true, env,empty,W) :- agent(W), time(T), T == 0.
 % GENERAL RULE if something occurs, the agent observes it.
 observed(T,true,env,WHAT,WHERE) :- occurs(T,env,WHAT,WHERE).
 
-hold(T,agent,in,W1) :- occurs(T,agent,move,(W,W1)), time(T).%, holds(T-1,agent,in,W).
+holds(T,agent,in,W1) :- occurs(T,agent,move,(W,W1)), time(T).%, holds(T-1,agent,in,W).
 holds(T,agent,in,W1) :- occurs(T,agent,stay,W1), time(T).%, holds(T,agent,in,W1).
 %time(T+1) :- holds(T+1,agent,in,_), holds(T,agent,in,_), time(T), ext_time(T+1).
 
