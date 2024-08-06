@@ -35,9 +35,12 @@ def agent_model(agent_m):
 def env_model(env_m):
     CURRENT_LOCATION.clear()
     for atom in env_m.symbols(shown=True):
+        # if atom not in ENV_KNOWLEDGE:
+        #     ENV_KNOWLEDGE.append(atom)
+        CURRENT_LOCATION.append(atom)
+    for atom in env_m.symbols(atoms=True):
         if atom not in ENV_KNOWLEDGE:
             ENV_KNOWLEDGE.append(atom)
-        CURRENT_LOCATION.append(atom)
 
 
 def solver(ext_time, target, load_lp, add_knowledge):
@@ -62,11 +65,26 @@ def debug(who):
     elif who == "env":
         for e in ENV_KNOWLEDGE:
             print(e)
+    elif who == "loc":
+        for e in CURRENT_LOCATION:
+            print(e)
+
+
+def print_debug(ext_time):
+    print("")
+    print(f"=============AGENT KNOWLEGDE: @{ext_time}============")
+    debug("agent")
+    print("")
+    print(f"=============ENV KNOWLEDGE:@{ext_time}==============")
+    debug("env")
+    print("")
+    print(f"=============LOCATION DATA:@{ext_time}==============")
+    debug("loc")
 
 
 def clinota():
     ext_time = 0
-    horizon = 1
+    horizon = 2
     exploring = True
 
     while exploring:
@@ -75,17 +93,14 @@ def clinota():
             solver(ext_time, "agent", LOAD_AGENT, False)
             # somehow reduce agent_knowledge transferd to env to holds(T,in(agent,C)).
             solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
-        #elif ext_time > 0:
-        #    working_knowledge = AGENT_KNOWLEDGE + CURRENT_LOCATION
-        #    print(ext_time)
-        #    solver(ext_time, "agent", LOAD_AGENT, working_knowledge)
+        elif ext_time > 0:
+            working_knowledge = AGENT_KNOWLEDGE + CURRENT_LOCATION
+            solver(ext_time, "agent", LOAD_AGENT, working_knowledge)
         #    solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
 
+        print_debug(ext_time)
+
         ext_time += 1
-        #print("AGENT")
-        debug("agent")
-        print("ENV")
-        debug("env")
         if ext_time == horizon:
             # later set to when gold was found
             exploring = False
