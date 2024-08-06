@@ -2,6 +2,7 @@
 
 %extract current agent location
 holds(T, agent, L) :- occurs(T,agent, move,(OL, L)). 
+holds(T, agent, L) :- occurs(T,agent, stay, L).
 
 % Populate Map, with walls from cave
 map((X-1..X+1,Y-1..Y+1)) :- cave((X,Y)).
@@ -30,4 +31,6 @@ occurs(T,S,B,E) :- holds(T,S,B,E), holds(T, agent, E).
 occurs(T,env,wall,(W,WW)) :- holds(T,env,wall,(W,WW)), holds(T,agent,W).
 occurs(T,env,wall,(WW,W)) :- holds(T,env,wall,(W,WW)), holds(T,agent,WW).
 
+
 #show occurs/4.
+

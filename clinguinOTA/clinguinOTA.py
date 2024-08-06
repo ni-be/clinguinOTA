@@ -96,7 +96,7 @@ def clinota():
         elif ext_time > 0:
             working_knowledge = AGENT_KNOWLEDGE + CURRENT_LOCATION
             solver(ext_time, "agent", LOAD_AGENT, working_knowledge)
-        #    solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
+            solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
 
         print_debug(ext_time)
 
