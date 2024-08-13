@@ -3,7 +3,6 @@ Wumpus Implementation According to the AAA
 
 """
 
-import re
 import time as t
 from clingo import Control
 
@@ -15,21 +14,18 @@ ENV_KNOWLEDGE = []
 
 
 LOAD_ENV = [
-    "world_facts/world_facts.lp",
-    "instances/instance00_env.lp",
+    "instances/instance_0.lp",
     "environment/environment.lp",
 ]
 LOAD_AGENT = [
-    "instances/instance00_agent.lp",
     "agent/agent.lp",
-    "world_facts/world_facts.lp",
 ]
 
 
 def agent_model(agent_m):
-    for atom in agent_m.symbols(shown=True):
-        if atom not in AGENT_KNOWLEDGE:
-            AGENT_KNOWLEDGE.append(atom)
+    for atom in agent_m.symbols(atoms=True):
+        # if atom not in AGENT_KNOWLEDGE:
+        AGENT_KNOWLEDGE.append(atom)
 
 
 def env_model(env_m):
@@ -47,9 +43,9 @@ def solver(ext_time, target, load_lp, add_knowledge):
     ctl = Control()
     for lp in load_lp:
         ctl.load(lp)
-    if add_knowledge:
-        for adk in add_knowledge:
-            ctl.add("base", [], f"{adk}.")
+    # if add_knowledge:
+    for adk in add_knowledge:
+        ctl.add("base", [], f"{adk}.")
     ctl.add("base", [], f"ext_time({ext_time}).")
     ctl.ground([("base", [])])
     if target == "agent":
@@ -71,32 +67,38 @@ def debug(who):
 
 
 def print_debug(ext_time):
-    print("")
+    # print(f"=============ENV KNOWLEDGE:@{ext_time}==============")
+    # debug("env")
+    # print("")
+
+    # print(f"=============LOCATION DATA:@{ext_time}==============")
+    # debug("loc")
+    # print("")
+
     print(f"=============AGENT KNOWLEGDE: @{ext_time}============")
     debug("agent")
     print("")
-    print(f"=============ENV KNOWLEDGE:@{ext_time}==============")
-    debug("env")
-    print("")
-    print(f"=============LOCATION DATA:@{ext_time}==============")
-    debug("loc")
+
+
+def clinguin_export():
+    with open("clinguin_data/env.lp", "a") as file:
+        for atom in ENV_KNOWLEDGE:
+            file.write(f"{atom}.\n")
+    with open("clinguin_data/agent.lp", "a") as file:
+        for atom in AGENT_KNOWLEDGE:
+            file.write(f"{atom}.\n")
 
 
 def clinota():
     ext_time = 0
-    horizon = 2
+    horizon = 5
     exploring = True
 
     while exploring:
         # for the initial state
-        if ext_time == 0:
-            solver(ext_time, "agent", LOAD_AGENT, False)
-            # somehow reduce agent_knowledge transferd to env to holds(T,in(agent,C)).
-            solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
-        elif ext_time > 0:
-            working_knowledge = AGENT_KNOWLEDGE + CURRENT_LOCATION
-            solver(ext_time, "agent", LOAD_AGENT, working_knowledge)
-            solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
+        solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
+        working_knowledge = AGENT_KNOWLEDGE + CURRENT_LOCATION
+        solver(ext_time, "agent", LOAD_AGENT, working_knowledge)
 
         print_debug(ext_time)
 
@@ -104,6 +106,8 @@ def clinota():
         if ext_time == horizon:
             # later set to when gold was found
             exploring = False
+
+    clinguin_export()
 
 
 clinota()

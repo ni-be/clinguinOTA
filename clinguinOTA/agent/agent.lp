@@ -1,43 +1,38 @@
 % AGENT ENCODING WUMPUS
+time(T) :- T = #max{T2 : ext_time(T2)}.
 
-time(0) :- ext_time(T), T == 0.
-time(T+1) :- occurs(T+1,agent,_,_), ext_time(T+1), T > 0. 
+%Possible movement direction an Agent can take
+dir((DX, DY)) :- DX = -1..1, DY = -1..1, |DX|+|DY| == 1.
+adjacent((X, Y), (X+DX, Y+DY)) :- holds(_,in(agent,(X,Y))), dir((DX, DY)). %X+DX = X', Y+DY = Y', DX != DY.
 
-observed(T, true, agent,in, WHERE) :- agent(WHERE), time(T), T == 0.
-observed(T, true, env,empty,W) :- agent(W), time(T), T == 0.
- 
-% GENERAL RULE if something occurs, the agent observes it.
-observed(T,true,env,WHAT,WHERE) :- occurs(T,env,WHAT,WHERE).
+% initial location:
+holds(0,in(agent,L)) :- holds(0, start(L)). 
+holds(T+1, in(agent,L)) :- occurs(T,move(agent,OL,L)).%, holds(T,in(agent,OL)),time(T).
 
-holds(T,agent,in,W1) :- occurs(T,agent,move,(W,W1)), time(T).%, holds(T-1,agent,in,W).
-holds(T,agent,in,W1) :- occurs(T,agent,stay,W1), time(T).%, holds(T,agent,in,W1).
-%time(T+1) :- holds(T+1,agent,in,_), holds(T,agent,in,_), time(T), ext_time(T+1).
+env(breeze). env(smell). env(sparkle).  
 
-% DEFAULT unless otherwise observed
-env(breeze). env(smell). env(sparkle). env(empty). 
-observed(T,false,env,WHAT,WHERE) :- holds(T,agent,in,WHERE), env(WHAT), not occurs(T,env,WHAT,WHERE), time(T).
+observed(T, true, env(E,L)) :- holds(T,env(E,L)), time(T).
+observed(T, false,env(E,L)) :- holds(T,env(empty,L)), holds(T,in(agent,L)), env(E), time(T).%, ext_time(T).
 
-holds(T,WHO,WHAT,WHERE) :- observed(T, true, WHO, WHAT, WHERE).
--holds(T,WHO,WHAT,WHERE) :- observed(T, false, WHO,WHAT,WHERE). 
+holds(T, F) :- observed(T, true, F).
+-holds(T,F) :- observed(T, false,F).
 
-happened(T,W0,W1,W2) :- observed(T,true, W0,W1,W2). 
-occurs(T,W0,W1,W2) :- happened(T,W0,W1,W2). 
+holds(T+1,F) :- holds(T+1,F), not -holds(T,F), time(T+1).%, T< ET.
+-holds(T+1,F) :- -holds(T+1,F), not holds(T,F), time(T+1).% T < ET.
 
+% WHY ONLY WITH TIME OUTSIDE OF CHOICE RULE???
+1 { occurs(T, move(agent,L1,L2)) : adjacent(L1,L2), holds(T,in(agent,L1))}1 :- time(T).
 
 
-%%% MOVEMENT %%%%%
+% Not allowed to pass through walls
+:- occurs(T, move(agent,L1,L2)), holds(T,env(wall,(L1,L2))), time(T).
 
-1{ occurs(T,agent,stay,P); occurs(T+1,agent,move,(P,PP)):adjacent(P,PP)}1 :- holds(T,agent,in,P).
-1{ occurs(T, agent, stay,P) : holds(T,agent,in,P)}1. %, T = 0, ext_time(T). 
-%0{ occurs(T, agent, move, (P, PP )) : adjacent(P,PP), holds(T,agent,in,P)}1. % :- holds(T, agent, in, P).  
+happened(T, F) :- observed(T,true, F). 
+occurs(T,F) :- happened(T,F). 
 
-temp_goal((1,2)).
-%goal :- holds(T,agent,in,P), time(T), temp_goal(P).
+
+goal :- holds(T, in(agent,L)), holds(T,env(sparkle,L)).
 %:- not goal. 
 
-% UPDATE Knowledge
-
-% holds(T+1,env(E,L)) :- holds(T,env(E,L)), not -holds(T+1, env(E,L)), int_time(T+1).
-% -holds(T+1, env(E,L)) :- -holds(T,env(E,L)), not holds(T+1, env(E,L)), int_time(T+1). 
 
  
