@@ -1,41 +1,93 @@
 elem(w,window,root).
 
     %%%%%%%%%%%%%%%%%%%%%%%%
-    % Grid
+    % env knowledge
     %%%%%%%%%%%%%%%%%%%%%%%%
     elem(ota,container,w).
     attr(ota,child_layout,grid).
-    attr(ota,width,100).
-    attr(ota,height,100).
+    attr(ota,width,200).
+    % attr(ota,height,200).
 
         %%%%%%%%%%%%%%%%%%%%%%%%
-        % Cell dropdown
+        % Environment Cont.
         %%%%%%%%%%%%%%%%%%%%%%%%
-        %elem(dd(X,Y),dropdown_menu,clinota):-cave((X,Y)).
-        attr(dd(X,Y),width,50):-cave((X,Y)).
-        attr(dd(X,Y),height,50):-cave((X,Y)).
-        attr(dd(X,Y),grid_column,X):-cave((X,Y)).
-        attr(dd(X,Y),grid_row,Y):-cave((X,Y)).
-        attr(dd(X,Y),class,("border-dark";"bg-primary")):-cave((X,Y)).
-        % attr(dd(X,Y),class,("opacity-100";"disabled";"fw-bold";"text-dark")):-cave((X,Y)).
-        %attr(dd(X,Y),class,("text-primary")):-_clinguin_assume(cave((X,Y)), true).
-        %attr(dd(X,Y),class,("text-info")):-_all(sudoku(X,Y,V)), not _clinguin_assume(sudoku(X,Y,V), true).
-        %attr(dd(X,Y),selected,V):-_all(sudoku(X,Y,V)).
-        %attr(dd(X,Y),selected,V):-sudoku(X,Y,V), _clinguin_browsing.
+        elem(env(X,Y),container,ota):-map((X,Y)).
+        attr(env(X,Y),width,50):-map((X,Y)).
+        attr(env(X,Y),height,50):-map((X,Y)).
+        attr(env(X,Y),grid_column,X):-map((X,Y)).
+        attr(env(X,Y),grid_row,Y):-map((X,Y)).
 
-            %%%%%%%%%%%%%%%%%%%%%%%%
-            % Cell items
-            %%%%%%%%%%%%%%%%%%%%%%%%
-            %elem(remove(X,Y), dropdown_menu_item, dd(X,Y)):-cave((X,Y)).
-            % attr(remove(X,Y), icon, ("fa-ban";"text-info")):-pos(X,Y).
-            % when(remove(X,Y), click, call, remove_assumption_signature(sudoku(X,Y,any))):-pos(X,Y).
+        % Basic Grid
 
-            % elem(ddi(X,Y,V),dropdown_menu_item,dd(X,Y)):-pos(X,Y), val(V).
-            % attr(ddi(X,Y,V),label,V):-pos(X,Y), val(V).
-            % attr(ddi(X,Y,V),class,("text-danger";"disabled")):-pos(X,Y), val(V), not _any(sudoku(X,Y,V)).
-            % when(ddi(X,Y,V),click,call,add_assumption(sudoku(X,Y,V),true)):-pos(X,Y), val(V).
+        % Start point
+        attr(env(X,Y), class,("border";"border-dark";"bg-info")) :- holds(0, start((X,Y))).
+        % ENV        
+        attr(env(X,Y), class,("border";"border-dark";"fa-solid";"fa-circle-down";"fa-2x")) :- holds(0, env, in(pit,(X,Y))), map((X,Y)).
+        attr(env(X,Y), class,("border";"border-dark";"fa-solid";"fa-hippo";"fa-2x")) :- holds(0, env, in(wumpus,(X,Y))), map((X,Y)).
+        attr(env(X,Y), class,("border";"border-dark";"fa-solid";"fa-gem";"fa-2x")) :- holds(0, env, in(gold, (X,Y))), map((X,Y)).
+        attr(env(X,Y), class,("border";"border-dark";"fa-solid";"fa-user";"fa-2x")) :- holds(4,in(agent,(X,Y))), map((X,Y)).
+        % room the agent visited
+        attr(env(X,Y), class,("border";"border-dark";"bg-success")) :- holds(4, env,in(agent,(X,Y))), map((X,Y)). 
 
+        % ENV EFFECTS
+        
+        attr(env(X,Y), class,("border";"border-dark";"fa-solid";"fa-wind";"fa-2x")) :- holds(0, env, effect(breeze,(X,Y))), map((X,Y)).
+        
+        attr(env(X,Y), class,("border";"border-dark";"fa-solid";"fa-biohazard";"fa-2x")) :- holds(0, env, effect(smell,(X,Y))), map((X,Y)).
+        attr(env(X,Y), class,("border";"border-dark";"bg-warning")) :- holds(0, env, effect(sparkle,(X,Y))), map((X,Y)).
 
+        
+                
+        attr(env(X,Y), class,("border")):- map((X,Y)).
+        % WALLS 
+        attr(env(X,Y), class,("rounded-bottom";)) :- holds(0,env, effect(wall,((X,Y),(X,Y')))), Y' > Y.
+
+        attr(env(X,Y), class,("rounded-top")) :- holds(0,env, effect(wall,((X,Y),(X,Y')))), Y' < Y.
+
+        attr(env(X,Y), class,("rounded-right";"bg-danger")) :- holds(0,env, effect(wall,((X,Y),(X',Y)))), X' > X.
+
+        attr(env(X,Y), class,("rounded-left";"bg-warning")) :- holds(0,env, effect(wall,((X,Y),(X',Y)))), X' < X.
+
+            
+        
+        % %%%%%%%%%%%%%%%%%%%%%%%%
+        % % Agent Container. 
+        % %%%%%%%%%%%%%%%%%%%%%%%%
+        time(4).
+
+        elem(agent(X,Y),container,ota):-cave((X,Y)).
+        attr(agent(X,Y),width,50):-cave((X,Y)).
+        attr(agent(X,Y),height,50):-cave((X,Y)).
+        attr(agent(X,Y),grid_column,X+100):- cave((X,Y)).
+        attr(agent(X,Y),grid_row,Y+100) :- cave((X,Y)).
+
+        % Observed EMPTY
+        attr(agent(X,Y), class,("border";"bg-success")) :- holds(4,env(empty,(X,Y))).
+        % Observed WALL
+
+        attr(agent(X,Y), class,("border";"rounded-top")) :- holds(4,env(wall,((X,Y),(X,Y')))), Y' < Y.
+
+        attr(agent(X,Y), class,("border";"rounded-bottom")) :- holds(4,env(wall,((X,Y),(X,Y')))), Y' > Y.
+        attr(agent(X,Y), class,("border";"rounded-left")) :- holds(4,env(wall,((X,Y),(X',Y)))), X' < X.
+
+        attr(agent(X,Y), class,("border";"rounded-right")) :- holds(4,env(wall,((X,Y),(X',Y)))), X' > X.
+        % Observed Sparkle
+
+        attr(agent(X,Y), class,("border";"bg-success";"border-dark";"fa-solid";"fa-gem";"fa-2x")) :- holds(4,env(sparkle,(X,Y))).
+        % Observed Breeze
+        attr(agent(X,Y), class,("border";"bg-success";"border-dark";"fa-solid";"fa-wind";"fa-2x")) :- holds(4,env(breeze,(X,Y))).
+
+        % Observed Smell
+        
+        attr(agent(X,Y), class,("border";"bg-success";"border-dark";"fa-solid";"fa-biohazard";"fa-2x")) :- holds(4,env(smell,(X,Y))).
+        
+        % CURRENT POSITION AT TIME T
+        attr(agent(X,Y), class,("border";"fa-solid";"fa-user";"fa-2x")):- holds(4,in(agent,(X,Y))), time(T).
+
+        
+        
+
+        
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Menu bar
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -43,18 +95,3 @@ elem(menu_bar, menu_bar, w).
 attr(menu_bar, title, "Wumpus Observe Think Act Loop").
 attr(menu_bar, icon, "fa-table-cells").
 
-    % elem(menu_bar_clear, button, menu_bar).
-    % attr(menu_bar_clear, label, "Clear").
-    % attr(menu_bar_clear, icon, "fa-trash").
-    % attr(menu_bar_clear, class, ("btn-outline-danger";"border-0")).
-    % when(menu_bar_clear, click, callback, clear_assumptions).
-
-    % elem(menu_bar_select, button, menu_bar).
-    % attr(menu_bar_select, label, "Select solution").
-    % attr(menu_bar_select, icon, "fa-hand-pointer").
-    % when(menu_bar_select, click, callback, select).
-
-    % elem(menu_bar_next, button, menu_bar).
-    % attr(menu_bar_next, label, "Next").
-    % attr(menu_bar_next, icon, "fa-forward-step").
-    % when(menu_bar_next, click, callback, next_solution).

@@ -654,7 +654,6 @@ holds(0,env(wall,((1,1),(0,1)))).
 holds(0,env(empty,(1,1))).
 holds(0,env,in(wumpus,(2,5))).
 holds(0,env,in(pit,(3,2))).
-holds(0,env,in(gold,(1,2))).
 holds(0,env,in(gold,(2,1))).
 holds(0,env,in(agent,(1,1))).
 holds(0,env,effect(wall,((1,1),(1,0)))).
@@ -738,7 +737,6 @@ holds(0,env,effect(wall,((11,8),(10,8)))).
 holds(0,env,effect(wall,((11,9),(10,9)))).
 holds(0,env,effect(wall,((11,10),(10,10)))).
 holds(0,env,effect(empty,(1,1))).
-holds(0,env,effect(sparkle,(1,2))).
 holds(0,env,effect(empty,(1,3))).
 holds(0,env,effect(empty,(1,4))).
 holds(0,env,effect(smell,(1,5))).
@@ -851,7 +849,6 @@ holds(1,env(sparkle,(2,1))).
 holds(1,env(empty,(1,1))).
 holds(1,env,in(agent,(2,1))).
 holds(1,env,effect(empty,(1,1))).
-holds(1,env,effect(sparkle,(1,2))).
 holds(1,env,effect(empty,(1,3))).
 holds(1,env,effect(empty,(1,4))).
 holds(1,env,effect(smell,(1,5))).
@@ -1032,7 +1029,6 @@ holds(1,env,effect(wall,((1,10),(1,11)))).
 holds(1,env,effect(wall,((1,1),(1,0)))).
 holds(1,env,in(agent,(1,1))).
 holds(1,env,in(gold,(2,1))).
-holds(1,env,in(gold,(1,2))).
 holds(1,env,in(pit,(3,2))).
 holds(1,env,in(wumpus,(2,5))).
 occurs(0,env(empty,(1,1))).
@@ -1067,7 +1063,6 @@ holds(2,env(sparkle,(2,1))).
 holds(2,env(empty,(1,1))).
 holds(2,env,in(agent,(3,1))).
 holds(2,env,effect(empty,(1,1))).
-holds(2,env,effect(sparkle,(1,2))).
 holds(2,env,effect(empty,(1,3))).
 holds(2,env,effect(empty,(1,4))).
 holds(2,env,effect(smell,(1,5))).
@@ -1169,7 +1164,6 @@ holds(2,env,effect(empty,(10,10))).
 holds(2,env,in(agent,(2,1))).
 holds(2,env,in(wumpus,(2,5))).
 holds(2,env,in(pit,(3,2))).
-holds(2,env,in(gold,(1,2))).
 holds(2,env,in(gold,(2,1))).
 holds(2,env,in(agent,(1,1))).
 holds(2,env,effect(wall,((1,1),(1,0)))).
@@ -1284,7 +1278,6 @@ holds(3,env(sparkle,(2,1))).
 holds(3,env(empty,(1,1))).
 holds(3,env,in(agent,(4,1))).
 holds(3,env,effect(empty,(1,1))).
-holds(3,env,effect(sparkle,(1,2))).
 holds(3,env,effect(empty,(1,3))).
 holds(3,env,effect(empty,(1,4))).
 holds(3,env,effect(smell,(1,5))).
@@ -1467,7 +1460,6 @@ holds(3,env,effect(wall,((1,10),(1,11)))).
 holds(3,env,effect(wall,((1,1),(1,0)))).
 holds(3,env,in(agent,(1,1))).
 holds(3,env,in(gold,(2,1))).
-holds(3,env,in(gold,(1,2))).
 holds(3,env,in(pit,(3,2))).
 holds(3,env,in(wumpus,(2,5))).
 occurs(2,move(agent,(3,1),(4,1))).
@@ -1509,7 +1501,6 @@ holds(4,env(sparkle,(2,1))).
 holds(4,env(empty,(1,1))).
 holds(4,env,in(agent,(5,1))).
 holds(4,env,effect(empty,(1,1))).
-holds(4,env,effect(sparkle,(1,2))).
 holds(4,env,effect(empty,(1,3))).
 holds(4,env,effect(empty,(1,4))).
 holds(4,env,effect(smell,(1,5))).
@@ -1613,7 +1604,6 @@ holds(4,env,in(agent,(3,1))).
 holds(4,env,in(agent,(2,1))).
 holds(4,env,in(wumpus,(2,5))).
 holds(4,env,in(pit,(3,2))).
-holds(4,env,in(gold,(1,2))).
 holds(4,env,in(gold,(2,1))).
 holds(4,env,in(agent,(1,1))).
 holds(4,env,effect(wall,((1,1),(1,0)))).
@@ -2386,7 +2376,6 @@ holds(0,env(wall,((1,1),(0,1)))).
 holds(0,env(empty,(1,1))).
 holds(0,env,in(wumpus,(2,5))).
 holds(0,env,in(pit,(3,2))).
-holds(0,env,in(gold,(1,2))).
 holds(0,env,in(gold,(2,1))).
 holds(0,env,in(agent,(1,1))).
 holds(0,env,effect(wall,((1,1),(1,0)))).
@@ -2470,7 +2459,6 @@ holds(0,env,effect(wall,((11,8),(10,8)))).
 holds(0,env,effect(wall,((11,9),(10,9)))).
 holds(0,env,effect(wall,((11,10),(10,10)))).
 holds(0,env,effect(empty,(1,1))).
-holds(0,env,effect(sparkle,(1,2))).
 holds(0,env,effect(empty,(1,3))).
 holds(0,env,effect(empty,(1,4))).
 holds(0,env,effect(smell,(1,5))).
@@ -2583,7 +2571,6 @@ holds(1,env(sparkle,(2,1))).
 holds(1,env(empty,(1,1))).
 holds(1,env,in(agent,(2,1))).
 holds(1,env,effect(empty,(1,1))).
-holds(1,env,effect(sparkle,(1,2))).
 holds(1,env,effect(empty,(1,3))).
 holds(1,env,effect(empty,(1,4))).
 holds(1,env,effect(smell,(1,5))).
@@ -2764,7 +2751,6 @@ holds(1,env,effect(wall,((1,10),(1,11)))).
 holds(1,env,effect(wall,((1,1),(1,0)))).
 holds(1,env,in(agent,(1,1))).
 holds(1,env,in(gold,(2,1))).
-holds(1,env,in(gold,(1,2))).
 holds(1,env,in(pit,(3,2))).
 holds(1,env,in(wumpus,(2,5))).
 occurs(0,env(empty,(1,1))).
@@ -2799,7 +2785,6 @@ holds(2,env(sparkle,(2,1))).
 holds(2,env(empty,(1,1))).
 holds(2,env,in(agent,(3,1))).
 holds(2,env,effect(empty,(1,1))).
-holds(2,env,effect(sparkle,(1,2))).
 holds(2,env,effect(empty,(1,3))).
 holds(2,env,effect(empty,(1,4))).
 holds(2,env,effect(smell,(1,5))).
@@ -2901,7 +2886,6 @@ holds(2,env,effect(empty,(10,10))).
 holds(2,env,in(agent,(2,1))).
 holds(2,env,in(wumpus,(2,5))).
 holds(2,env,in(pit,(3,2))).
-holds(2,env,in(gold,(1,2))).
 holds(2,env,in(gold,(2,1))).
 holds(2,env,in(agent,(1,1))).
 holds(2,env,effect(wall,((1,1),(1,0)))).
@@ -3016,7 +3000,6 @@ holds(3,env(sparkle,(2,1))).
 holds(3,env(empty,(1,1))).
 holds(3,env,in(agent,(4,1))).
 holds(3,env,effect(empty,(1,1))).
-holds(3,env,effect(sparkle,(1,2))).
 holds(3,env,effect(empty,(1,3))).
 holds(3,env,effect(empty,(1,4))).
 holds(3,env,effect(smell,(1,5))).
@@ -3199,7 +3182,6 @@ holds(3,env,effect(wall,((1,10),(1,11)))).
 holds(3,env,effect(wall,((1,1),(1,0)))).
 holds(3,env,in(agent,(1,1))).
 holds(3,env,in(gold,(2,1))).
-holds(3,env,in(gold,(1,2))).
 holds(3,env,in(pit,(3,2))).
 holds(3,env,in(wumpus,(2,5))).
 occurs(2,move(agent,(3,1),(4,1))).
@@ -3241,7 +3223,6 @@ holds(4,env(sparkle,(2,1))).
 holds(4,env(empty,(1,1))).
 holds(4,env,in(agent,(5,1))).
 holds(4,env,effect(empty,(1,1))).
-holds(4,env,effect(sparkle,(1,2))).
 holds(4,env,effect(empty,(1,3))).
 holds(4,env,effect(empty,(1,4))).
 holds(4,env,effect(smell,(1,5))).
@@ -3345,7 +3326,6 @@ holds(4,env,in(agent,(3,1))).
 holds(4,env,in(agent,(2,1))).
 holds(4,env,in(wumpus,(2,5))).
 holds(4,env,in(pit,(3,2))).
-holds(4,env,in(gold,(1,2))).
 holds(4,env,in(gold,(2,1))).
 holds(4,env,in(agent,(1,1))).
 holds(4,env,effect(wall,((1,1),(1,0)))).
