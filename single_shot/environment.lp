@@ -1,6 +1,6 @@
 % Everything related to the environment itself.
 
-time(T) :- T = #max{T2 : ext_time(T2)}.
+current_time(T) :- T = #max{T2 : time(T2)}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% WORLD RULES
@@ -17,19 +17,19 @@ adjacent((X, Y), (X+DX, Y+DY)) :- cave((X, Y)), cave((X',Y')), dir((DX, DY)).
 
 
 %INIT LOCATION
-holds(T,env(agent, L )) :- holds(T, start(L)), time(T), T == 0.
+holds(T,in(agent, L )) :- holds(T, start(L)), current_time(T), T == 0.
 
-holds(0, env(sparkle, G)) :- holds(0,env(gold,G)).
-holds(0, env(breeze, PP)) :- holds(0,env(pit,P)), adjacent(P,PP), cave(PP).
-holds(0, env(smell, WW)) :- holds(0,env(wumpus,W)), adjacent(W,WW), cave(WW).
+eholds(0, env(sparkle, G)) :- eholds(0,env(gold,G)).
+eholds(0, env(breeze, PP)) :- eholds(0,env(pit,P)), adjacent(P,PP), cave(PP).
+eholds(0, env(smell, WW)) :- eholds(0,env(wumpus,W)), adjacent(W,WW), cave(WW).
 
-holds(T,env(empty, E)) :- not holds(T,env(sparkle,E)), 
-                                  not holds(T,env(breeze,E)), 
-                                  not holds(T,env(smell,E)), 
+eholds(T,env(empty, E)) :- not eholds(T,env(sparkle,E)), 
+                                  not eholds(T,env(breeze,E)), 
+                                  not eholds(T,env(smell,E)), 
                                   cave(E), time(T).
 
-holds(0,env(wall,(W,WW))) :- wall(W,WW).
-holds(0,env(wall,(W,WW))) :- wall(WW,W).
+eholds(0,env(wall,(W,WW))) :- wall(W,WW).
+eholds(0,env(wall,(W,WW))) :- wall(WW,W).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,8 +37,8 @@ holds(0,env(wall,(W,WW))) :- wall(WW,W).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Extra Current Location data after agent perfomed an action:
-holds(T+1,env(agent, L)) :- occurs(T, move(agent,OL, L)), time(T+1). 
-holds(T+1,env(agent,L)) :- occurs(T, grab_gold(agent,L)), time(T+1).
+holds(T,in(agent, L)) :- occurs(T-1, move(agent,OL, L)), time(T). 
+holds(T,in(agent,L)) :- occurs(T-1, grab_gold(agent,L)), time(T).
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -46,20 +46,23 @@ holds(T+1,env(agent,L)) :- occurs(T, grab_gold(agent,L)), time(T+1).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Update time for var if no change occurs. 
-holds(T+1,F) :- holds(T,F), not -holds(T+1,F), time(T+1).
--holds(T+1,F) :- -holds(T,F), not holds(T+1,F), time(T+1).
+eholds(T,env(E,L)) :- eholds(T-1,env(E,L)), not -eholds(T,env(E,L)), time(T).
+-eholds(T,env(E,L)) :- -eholds(T-1,env(E,L)), not eholds(T,env(E,L)), time(T).
+
 
 % After the agent grabed gold 
--holds(T+1, env(gold,G)) :- occurs(T,grab_gold(agent,G)), time(T+1). 
-
+-eholds(T, env(gold,G)) :- eholds(T, env(gold,G)), occurs(T,carry_gold(G)), time(T+1). 
+-holds(T, env(sparkle,G)) :- eholds(T, env(sparkle,G)), occurs(T,carry_gold(G)), time(T+1).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% OUTPUT CONVERSEN / FILTER FOR AGENT %%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Only share the effects - breeze, sparkle, smell, empty, wall
-eholds(T, env(E,L)) :- holds(T,env(E,L)), holds(T, env(agent,L)), time(T).
-eholds(T, env(E,(L1,L2))) :- holds(T,env(E,(L1,L2))), holds(T,env(agent,L1)), time(T).
-  
-#show eholds/2.
 
+
+envholds(T, env(E,L)) :- eholds(T,env(E,L)), holds(T, in(agent,L)), time(T).
+envholds(T, env(E,(L1,L2))) :- eholds(T,env(E,(L1,L2))), holds(T,in(agent,L1)), time(T).
+  
+#show envholds/2.
+#show holds/2.

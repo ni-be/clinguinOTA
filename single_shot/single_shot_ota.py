@@ -32,21 +32,21 @@ def env_model(env_m):
     CURRENT_LOCATION.clear()
     for atom in env_m.symbols(shown=True):
         # if atom not in ENV_KNOWLEDGE:
-        #     ENV_KNOWLEDGE.append(atom)
+        # ENV_KNOWLEDGE.append(atom)
         CURRENT_LOCATION.append(atom)
     for atom in env_m.symbols(atoms=True):
         if atom not in ENV_KNOWLEDGE:
             ENV_KNOWLEDGE.append(atom)
 
 
-def solver(ext_time, target, load_lp, add_knowledge):
+def solver(time, target, load_lp, add_knowledge):
     ctl = Control()
     for lp in load_lp:
         ctl.load(lp)
     # if add_knowledge:
     for adk in add_knowledge:
         ctl.add("base", [], f"{adk}.")
-    ctl.add("base", [], f"ext_time({ext_time}).")
+    ctl.add("base", [], f"time({time}).")
     ctl.ground([("base", [])])
     if target == "agent":
         ctl.solve(on_model=agent_model)
@@ -67,9 +67,9 @@ def debug(who):
 
 
 def print_debug(ext_time):
-    print(f"=============ENV KNOWLEDGE:@{ext_time}==============")
-    debug("env")
-    print("")
+    # print(f"=============ENV KNOWLEDGE:@{ext_time}==============")
+    # debug("env")
+    # print("")
 
     # print(f"=============LOCATION DATA:@{ext_time}==============")
     # debug("loc")
@@ -90,20 +90,20 @@ def clinguin_export():
 
 
 def single_shot():
-    ext_time = 0
-    horizon = 9
+    time = 0
+    horizon = 10
 
     exploring = True
 
     while exploring:  # for the initial state
-        solver(ext_time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
+        solver(time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
         working_knowledge = AGENT_KNOWLEDGE + CURRENT_LOCATION
-        solver(ext_time, "agent", LOAD_AGENT, working_knowledge)
+        solver(time, "agent", LOAD_AGENT, working_knowledge)
 
-        print_debug(ext_time)
+        print_debug(time)
 
-        ext_time += 1
-        if ext_time == horizon:
+        time += 1
+        if time == horizon:
             # later set to when gold was found
             exploring = False
 
