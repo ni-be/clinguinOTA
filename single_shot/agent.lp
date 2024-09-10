@@ -77,7 +77,7 @@ holds(T,env(E,L)) :- holds(T-1,env(E,L)), not -holds(T,env(E,L)), time(T).
 % % IF EMPTY -> explore / move to new field if possible else move back
 % %%%%%%%%%%%%%%%%%%%%%%%
 
-1 { goal(T,explore,(L,L')): adjacent(L,L')} 1:- holds(T,in(agent,L)), time(T).
+1{ goal(T,explore,(L,L')): adjacent(L,L')} 1:- holds(T,in(agent,L)), time(T).
 
 
 
@@ -86,6 +86,8 @@ holds(T,env(E,L)) :- holds(T-1,env(E,L)), not -holds(T,env(E,L)), time(T).
 
 :- goal(T,explore,(L,L')), 
    holds(T-1,in(agent,L')), adjacent(L,L'). %, -holds(T,know(safe,(X+DX,Y+DY))). 
+
+% :- goal(T, explore, (_,_)), goal(T',grab_gold, _), T < T' . 
 
 % % :- goal(T,explore,((X,Y),(DX,DY))), 
 % %    holds(T,in(agent,(X+DX,Y+DY))), time(K), current_time(T), T > K, dir((DX,DY)), not holds(T-1,know(safe,(X+DX,Y+DY))). 
@@ -129,13 +131,14 @@ goal(T,grab_gold,L) :- holds(T,env(sparkle,L)), holds(T,in(agent,L)).
 
 % % IF EMPTY
 % %%%%%%%%%%%%%%%%%%%%%%
-occurs(T,move(agent,L,L' )) :- goal(T,explore,(L,L')). 
+occurs(T,move(agent,L,L' )) :- goal(T,explore,(L,L')), not goal(T, grab_gold, L). 
 
 
 % % IF SPARKLE
 % %%%%%%%%%%%%%%%%%%%%%%
 
-% occurs(T, grab_gold(agent,L)) :- goal(T, grab_gold,L). 
+occurs(T, grab_gold(agent,L)) :- goal(T, grab_gold,L). 
+%hold(T, in(carry_gold,G)) :- occurs(T,grab_gold,G). 
 
 % % IF CARRY GOLD
 % %%%%%%%%%%%%%%%%%%%%%%

@@ -51,8 +51,8 @@ eholds(T,env(E,L)) :- eholds(T-1,env(E,L)), not -eholds(T,env(E,L)), time(T).
 
 
 % After the agent grabed gold 
--eholds(T, env(gold,G)) :- eholds(T, env(gold,G)), occurs(T,carry_gold(G)), time(T+1). 
--holds(T, env(sparkle,G)) :- eholds(T, env(sparkle,G)), occurs(T,carry_gold(G)), time(T+1).
+-eholds(T, env(gold,G)) :- eholds(T-1, env(gold,G)), occurs(T-1,grab_gold(agent,G)), time(T). 
+-eholds(T, env(sparkle,G)) :- eholds(T-1, env(sparkle,G)), occurs(T-1,grab_gold(agent,G)), time(T).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% OUTPUT CONVERSEN / FILTER FOR AGENT %%%%%%

@@ -91,7 +91,7 @@ def clinguin_export():
 
 def single_shot():
     time = 0
-    horizon = 10
+    horizon = 20
 
     exploring = True
 
