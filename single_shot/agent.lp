@@ -47,19 +47,25 @@ observed(T, false,env(E,L)) :- envholds(T,env(empty,L)),
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % % %ASSUME SAFE
-% % holds(T,know(safe,L)) :- holds(T,env(empty,L)), holds(T,in(agent,L)).
-% % holds(T,know(safe,L')) :- holds(T,env(empty,L)), adjacent(L,L'),holds(T, in(agent,L)).
-% % holds(T,know(safe,L)) :- holds(T,env(sparkle,L)), holds(T,in(agent,L)).
- 
-% % -holds(T, know(safe,L')):- holds(T,env(breeze,L)), adjacent(L,L'), holds(T,in(agent,L)).
-% % -holds(T, know(safe,L')):- holds(T,env(smell,L)), adjacent(L,L'), holds(T,in(agent,L)).
+observed(T, true, env(safe,L )) :- holds(T,env(empty,L)), holds(T,in(agent,L)).
+observed(T, true, env(safe,L')) :- holds(T,env(empty,L)), adjacent(L,L'),holds(T, in(agent,L)).
+observed(T, true, env(safe,L )) :- holds(T,env(sparkle,L)), holds(T,in(agent,L)).
 
+% right now have to add not holds(safe, L), otherwise constant recheck
+observed(T, false, env(safe,L')):- holds(T,env(breeze,L)), adjacent(L,L'), holds(T,in(agent,L)), not holds(T,env(safe,L)), not holds(K, in(agent,L')), time(K), K < T.
+observed(T, false, env(safe,L')):- holds(T,env(smell,L)), adjacent(L,L'), holds(T,in(agent,L)), not holds(T, env(safe,L)).
 
-% % % ASSUME a Pit or Wumpus to be at an adjacent location of the smell, that we have not yet visited. 
-% % holds(T, assume(pit,L')):- holds(T,env(breeze,L)), adjacent(L,L'), holds(T,in(agent,L)).
-% % holds(T, assume(wumpus,L')):- holds(T,env(smell,L)), adjacent(L,L'), holds(T,in(agent,L)).
+% ASSUME a Pit or Wumpus to be at an adjacent location of the smell, that we have not yet visited. 
+observed(T, true, env(assume(pit,L')))  :- holds(T,env(breeze,L)), adjacent(L,L'), holds(T,in(agent,L)), not holds(T, env(safe,L')).
+observed(T, false, env(assume(pit,L)))  :- holds(T, in(agent,L)), holds(T,env(safe,L)), time(T), holds(T, env(assume(pit,L))).
 
+observed(T, true, env(assume(wumpus,L')))  :- holds(T,env(smell,L)), adjacent(L,L'), holds(T,in(agent,L)), not holds(T, env(safe,L')).
+observed(T, false, env(assume(wumpus,L)))  :- holds(T, in(agent,L)), holds(T,env(safe,L)), time(T), holds(T, env(assume(wumpus,L))).
 
+% If 2 breezes are known and they share an adjacent that shared adjacent should be a pit
+observed(T, true, env(pit,L)):- holds(T,env(breeze, B)), holds(T, env(breeze,B')), adjacent(B,L), adjacent(B',L), B != B', not holds(T,env(safe,L)).
+
+observed(T, true, env(pit,L)):- holds(T,env(smell, B)), holds(T, env(smell,B')), adjacent(B,L), adjacent(B',L), B != B', not holds(T,env(safe,L)).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % Update knowledge base
@@ -71,86 +77,83 @@ holds(T,env(E,L)) :- holds(T-1,env(E,L)), not -holds(T,env(E,L)), time(T).
 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% THINK: select an approriate Goal, G; Find a plan, to achieve G
+% %% THINK: select an approriate Goal, G
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % % IF EMPTY -> explore / move to new field if possible else move back
 % %%%%%%%%%%%%%%%%%%%%%%%
 
-1{ goal(T,explore,(L,L')): adjacent(L,L')} 1:- holds(T,in(agent,L)), time(T).
-
-
+1{ goal(T,explore,(L,L')): adjacent(L,L')} 1:- holds(T,in(agent,L)), time(T), not holds(T, env(carry_gold,_)).
 
 :- goal(T,explore,(L,L')), 
    holds(T,env(wall,(L,L'))), adjacent(L,L'), holds(T, in(agent,L)).
 
 :- goal(T,explore,(L,L')), 
-   holds(T-1,in(agent,L')), adjacent(L,L'). %, -holds(T,know(safe,(X+DX,Y+DY))). 
-
-% :- goal(T, explore, (_,_)), goal(T',grab_gold, _), T < T' . 
-
-% % :- goal(T,explore,((X,Y),(DX,DY))), 
-% %    holds(T,in(agent,(X+DX,Y+DY))), time(K), current_time(T), T > K, dir((DX,DY)), not holds(T-1,know(safe,(X+DX,Y+DY))). 
+   holds(T-1,in(agent,L')), adjacent(L,L'). 
 
 
-% % IF SPARKLE -> goal is to grab gold 
-% %%%%%%%%%%%%%%%%%%%%%%%
+% IF SPARKLE -> goal is to grab gold 
+%%%%%%%%%%%%%%%%%%%%%%%
 goal(T,grab_gold,L) :- holds(T,env(sparkle,L)), holds(T,in(agent,L)).
 
+% IF EMPTY and Grabbed GOLD -> move along the know path to start. 
+%%%%%%%%%%%%%%%%%%%%%%%
+
+1{ goal(T,leave,(L,L')): adjacent(L,L') } 1 :- holds(T, in(agent,L)), holds(T, env(carry_gold,_)). 
+
+:- goal(T,leave,(L,L')), 
+   holds(T,env(wall,(L,L'))), adjacent(L,L'), holds(T, in(agent,L)).
+
+% when leaving go to those room the agent was already in. 
+:- goal(T,leave,(L,L')), 
+   not holds(_,in(agent,L')), adjacent(L,L'). 
+   % need to add safe condition in there as well. 
+
+% use manhatten distance to find back to exit
+
+:- goal(T,leave,((X,Y),(X',Y'))), holds(T,env(exit,(EX,EY))), ND = |X' - EX| + |Y' - EY|, OD = | X-EX| + |Y-EY|, ND > OD.
+
+   % Assign a penalty if not prior room is visited when leaving
+   % cost(2) :- goal(T,leave,(L,L')), not holds(K,env(safe,L')), time(K), K < T, current_time(T).
+   % cost(1) :- goal(T,leave,(L,L')), holds(K,in(safe,L')), time(K), K < T, current_time(T).  
+   % #minimize { P : cost(P) }.
 
 
-% % IF EMPTY and Grabbed GOLD -> move along the know path to start. 
-% %%%%%%%%%%%%%%%%%%%%%%%
 
-% %1{ goal(T,leave,(L,D)): dir(D)}1 :- holds(T,in(agent,L)), holds(T, carry_gold(_)), time(T). 
-% %:- goal(T,leave,((X,Y),(DX,DY))), 
-% %   holds(T,env(wall,((X,Y),(X+DX,Y+DY)))), current_time(T),dir((DX,DY)).
-
-% % IF BREEZE -> try to confirm PIT
-% %%%%%%%%%%%%%%%%%%%%%%%
+% IF PIT confirmed -> move arround
+%%%%%%%%%%%%%%%%%%%%%%%
 
 
-% % IF SMELL -> try to confirm WUMPUS
-% %%%%%%%%%%%%%%%%%%%%%%%
+% IF Wumpus -> Kill it
+%%%%%%%%%%%%%%%%%%%%%%%
 
+% IF Grabbed GOLD + reached exit
+goal(T,escaped(agent,L')) :- occurs(T,move(agent,_,L)),holds(T,env(exit,L')), holds(T, env(start,L)), holds(T, env(carry_gold,_)). 
 
-% % IF PIT confirmed -> move arround
-% %%%%%%%%%%%%%%%%%%%%%%%
-
-
-% % IF Wumpus -> Kill it
-% %%%%%%%%%%%%%%%%%%%%%%%
-
-% % IF Grabbed GOLD + reached exit
-% %goal(T,escaped) :- holds(T,in(agent,L)), holds(K, in(agent,L)), K == 0, T > K. 
-% %:- goal(T,escaped).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %% ACT : Exectute part of the plan: update knowledge base; Back to observe
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% % IF EMPTY
-% %%%%%%%%%%%%%%%%%%%%%%
+% Move and Escpae
+%%%%%%%%%%%%%%%%%%%%%%%
 occurs(T,move(agent,L,L' )) :- goal(T,explore,(L,L')), not goal(T, grab_gold, L). 
+occurs(T,move(agent,L,L'))  :- goal(T,leave,  (L,L')), not goal(T, grab_gold, L ).
+occurs(T,escape(agent,L)) :- goal(T, escaped(agent,L)). 
 
-
-% % IF SPARKLE
-% %%%%%%%%%%%%%%%%%%%%%%
-
+% IF SPARKLE
+%%%%%%%%%%%%%%%%%%%%%%
 occurs(T, grab_gold(agent,L)) :- goal(T, grab_gold,L). 
-%hold(T, in(carry_gold,G)) :- occurs(T,grab_gold,G). 
-
-% % IF CARRY GOLD
-% %%%%%%%%%%%%%%%%%%%%%%
-
-% %occurs(T,move(agent,(X,Y),(X+DX,Y+DY)) ) :- goal(T,leave,((X,Y),(DX,DY))). 
-
-% % IF BREEZE
-% %%%%%%%%%%%%%%%%%%%%%%
+holds(T, env(carry_gold,G)) :- occurs(T,grab_gold(agent,G)). 
 
 
-% % IF SMELL
-% %%%%%%%%%%%%%%%%%%%%%%
+% IF BREEZE
+%%%%%%%%%%%%%%%%%%%%%%
+
+
+% IF SMELL
+%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 

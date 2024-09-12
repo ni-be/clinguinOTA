@@ -17,7 +17,7 @@ adjacent((X, Y), (X+DX, Y+DY)) :- cave((X, Y)), cave((X',Y')), dir((DX, DY)).
 
 
 %INIT LOCATION
-holds(T,in(agent, L )) :- holds(T, start(L)), current_time(T), T == 0.
+holds(T,in(agent, L )) :- eholds(T, start(L)), current_time(T), T == 0.
 
 eholds(0, env(sparkle, G)) :- eholds(0,env(gold,G)).
 eholds(0, env(breeze, PP)) :- eholds(0,env(pit,P)), adjacent(P,PP), cave(PP).
@@ -63,6 +63,8 @@ eholds(T,env(E,L)) :- eholds(T-1,env(E,L)), not -eholds(T,env(E,L)), time(T).
 
 envholds(T, env(E,L)) :- eholds(T,env(E,L)), holds(T, in(agent,L)), time(T).
 envholds(T, env(E,(L1,L2))) :- eholds(T,env(E,(L1,L2))), holds(T,in(agent,L1)), time(T).
-  
+envholds(T, env(exit,L)) :-   eholds(T,exit(L)), time(T). 
+envholds(T, env(start,L)) :- eholds(T,start(L)), time(T).
+
 #show envholds/2.
 #show holds/2.
