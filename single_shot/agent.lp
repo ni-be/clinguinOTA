@@ -64,7 +64,6 @@ observed(T, false, env(assume(wumpus,L)))  :- holds(T, in(agent,L)), holds(T,env
 
 % If 2 breezes are known and they share an adjacent that shared adjacent should be a pit
 observed(T, true, env(pit,L)):- holds(T,env(breeze, B)), holds(T, env(breeze,B')), adjacent(B,L), adjacent(B',L), B != B', not holds(T,env(safe,L)).
-
 observed(T, true, env(pit,L)):- holds(T,env(smell, B)), holds(T, env(smell,B')), adjacent(B,L), adjacent(B',L), B != B', not holds(T,env(safe,L)).
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -85,12 +84,14 @@ holds(T,env(E,L)) :- holds(T-1,env(E,L)), not -holds(T,env(E,L)), time(T).
 
 1{ goal(T,explore,(L,L')): adjacent(L,L')} 1:- holds(T,in(agent,L)), time(T), not holds(T, env(carry_gold,_)).
 
+
 :- goal(T,explore,(L,L')), 
    holds(T,env(wall,(L,L'))), adjacent(L,L'), holds(T, in(agent,L)).
 
 :- goal(T,explore,(L,L')), 
-   holds(T-1,in(agent,L')), adjacent(L,L'). 
+   holds(T-1,in(agent,L')), adjacent(L,L'), not holds(T,env(safe,L')). 
 
+% :- goal(T,explore,(L,_)), goal(T,move_back,(L,_)).
 
 % IF SPARKLE -> goal is to grab gold 
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -122,6 +123,8 @@ goal(T,grab_gold,L) :- holds(T,env(sparkle,L)), holds(T,in(agent,L)).
 
 % IF PIT confirmed -> move arround
 %%%%%%%%%%%%%%%%%%%%%%%
+%goal(T, move_back,(L,BL)) :- holds(T,in(agent,L)), holds(T-1,in(agent,BL)), time(T), T>1.
+
 
 
 % IF Wumpus -> Kill it
@@ -137,9 +140,10 @@ goal(T,escaped(agent,L')) :- occurs(T,move(agent,_,L)),holds(T,env(exit,L')), ho
 
 % Move and Escpae
 %%%%%%%%%%%%%%%%%%%%%%%
-occurs(T,move(agent,L,L' )) :- goal(T,explore,(L,L')), not goal(T, grab_gold, L). 
+occurs(T,move(agent,L,L' )) :- goal(T,explore,(L,L')), not goal(T, grab_gold, L).
 occurs(T,move(agent,L,L'))  :- goal(T,leave,  (L,L')), not goal(T, grab_gold, L ).
 occurs(T,escape(agent,L)) :- goal(T, escaped(agent,L)). 
+occurs(T,move(agent,L,L')) :- goal(T,move_back,(L,L')). 
 
 % IF SPARKLE
 %%%%%%%%%%%%%%%%%%%%%%
