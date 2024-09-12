@@ -75,8 +75,8 @@ attr(w,class,("d-flex";"flex-row")).
 
         % Basic Grid
 
-%         % Start point
-%         % #TODO predicate to state that you know the cell
+        % Start point
+        % #TODO predicate to state that you know the cell
         
         attr(agent(X,Y), class,("bg-secondary")) :- map((X,Y)), holds(T, in(agent,(X,Y))), ctime(T).
         
@@ -87,16 +87,16 @@ attr(w,class,("d-flex";"flex-row")).
         % attr(agent(X,Y),grid_column,X):- cave((X,Y)).
         % attr(agent(X,Y),grid_row,Y) :- cave((X,Y)).
 
-%         % Observed EMPTY
+       % Observed EMPTY
         attr(agent(X,Y), class,("bg-info")) :- holds(T,env(empty,(X,Y))), ctime(T).
-%         % WALLS
+       % WALLS
         attr(agent(X,Y), class,("border-bottom";"border-dark";"border-3")) :- holds(T, env(wall,((X,Y),(X,Y')))), Y' > Y, ctime(T).
         attr(agent(X,Y), class,("border-top";"border-dark";"border-3")) :- holds(T, env(wall,((X,Y),(X,Y')))), Y' < Y, ctime(T).
         attr(agent(X,Y), class,("border-end";"border-dark";"border-3")) :- holds(T, env(wall,((X,Y),(X',Y)))), X' > X, ctime(T).
         attr(agent(X,Y), class,("border-start";"border-dark";"border-3")) :- holds(T, env(wall,((X,Y),(X',Y)))), X' < X, ctime(T).
 
 
-%         % Observed Sparkle
+        % Observed Sparkle
 
         attr(agent(X,Y), class,("bg-success";"fa-solid";"fa-gem";"fa-2x")) :- occurs(T,env(sparkle,(X,Y))), ctime(T).
          % Observed Breeze
@@ -110,12 +110,12 @@ attr(w,class,("d-flex";"flex-row")).
 
 
 
-% % TODO use label to add time and more information. environment
-% % fix bug environment knows 
+% TODO use label to add time and more information. environment
+% fix bug environment knows 
 
-% %%%%%%%%%%%%%%%%%%%%%%%%
-% % Menu bar
-% %%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Menu bar
+%%%%%%%%%%%%%%%%%%%%%%%
 elem(menu_bar, menu_bar, w).
 attr(menu_bar, title, "Wumpus Observe Think Act Loop").
 attr(menu_bar, icon, "fa-table-cells").

@@ -81,17 +81,17 @@ def print_debug(ext_time):
 
 
 def clinguin_export():
-    with open("single_shot/data_single_shot_env.lp", "a") as file:
+    with open("single_shot/data_single_shot_env.lp", "w") as file:
         for atom in ENV_KNOWLEDGE:
             file.write(f"{atom}.\n")
-    with open("single_shot/data_single_shot_agent.lp", "a") as file:
+    with open("single_shot/data_single_shot_agent.lp", "w") as file:
         for atom in AGENT_KNOWLEDGE:
             file.write(f"{atom}.\n")
 
 
 def single_shot():
     time = 0
-    horizon = 20
+    horizon = 25
 
     exploring = True
 

@@ -1,5 +1,14 @@
+% TODO 
+% WHEN BREEZE AND GOLD SAME LOCATION
+% moving back
+% clinguin - gui colors
+
+
 % AGENT ENCODING WUMPUS
 current_time(T) :- T = #max{T2 : time(T2)}.
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % WORLD RULES
@@ -124,6 +133,7 @@ goal(T,grab_gold,L) :- holds(T,env(sparkle,L)), holds(T,in(agent,L)).
 % IF PIT confirmed -> move arround
 %%%%%%%%%%%%%%%%%%%%%%%
 %goal(T, move_back,(L,BL)) :- holds(T,in(agent,L)), holds(T-1,in(agent,BL)), time(T), T>1.
+
 
 
 
