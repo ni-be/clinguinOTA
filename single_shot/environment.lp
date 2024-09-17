@@ -40,6 +40,7 @@ eholds(0,env(wall,(W,WW))) :- wall(WW,W).
 holds(T,in(agent, L)) :- occurs(T-1, move(agent,OL, L)), time(T). 
 holds(T,in(agent,L)) :- occurs(T-1, grab_gold(agent,L)), time(T).
 
+eholds(T,env(agent,L)) :- holds(T,in(agent,L)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THINK / UPDATE KNOWLEDGE
