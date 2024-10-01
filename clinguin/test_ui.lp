@@ -143,18 +143,19 @@ attr(w,class,("d-flex";"flex-row")).
 elem(menu_bar, menu_bar, w).
 attr(menu_bar, title, "Wumpus Observe Think Act Loop").
 
-attr(menu_bar, icon, "fa-table-cells").
-     elem(menu_bar_prev, button, menu_bar):- ctime(T), time(T-1), T > 0.
-     attr(menu_bar_prev, label, "Previous Time Step"):- ctime(T), time(T-1), T > 0.
-     attr(menu_bar_prev, icon, "fa-backward-step"):- ctime(T), time(T-1), T > 0.
+% attr(menu_bar, icon, "fa-table-cells").
+%      elem(menu_bar_prev, button, menu_bar):- ctime(T), time(T-1), T > 0.
+%      attr(menu_bar_prev, label, "Previous Time Step"):- ctime(T), time(T-1), T > 0.
+%      attr(menu_bar_prev, icon, "fa-backward-step"):- ctime(T), time(T-1), T > 0.
 
-when(menu_bar_prev, click, call, set_constant("guitime", T-1)):- ctime(T), time(T-1), T > 0.
+% when(menu_bar_prev, click, call, set_constant("guitime", T-1)):- ctime(T), time(T-1), T > 0.
 
-     elem(menu_bar_next, button, menu_bar):- ctime(T), time(T+1), max_time(K), T < K.
-     attr(menu_bar_next, label, "Next Time Step"):- ctime(T), time(T+1), max_time(K), T < K. 
-     attr(menu_bar_next, icon, "fa-forward-step"):- ctime(T), time(T+1),max_time(K), T < K.
+      elem(menu_bar_next, button, menu_bar):- ctime(T), time(T+1), max_time(K), T < K.
+      attr(menu_bar_next, label, "Next Time Step"):- ctime(T), time(T+1), max_time(K), T < K. 
+      attr(menu_bar_next, icon, "fa-forward-step"):- ctime(T), time(T+1),max_time(K), T < K.
 
-when(menu_bar_next, click, call, set_constant("guitime", T+1)):- ctime(T), time(T+1), max_time(K), T < K.
+% when(menu_bar_next, click, call, set_constant("guitime", T+1)):- ctime(T), time(T+1), max_time(K), T < K.
 
-
+when(menu_bar_next, click, call, select()).
+when(menu_bar_next, click, call, (select(), observe(T))) :- ctime(T).
 

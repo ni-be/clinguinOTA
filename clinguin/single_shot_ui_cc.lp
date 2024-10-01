@@ -158,3 +158,9 @@ when(menu_bar_next, click, call, set_constant("guitime", T+1)):- ctime(T), time(
 
 
 
+% OPTION 1 - Do everything from within clinguin no custom backend
+
+% WHEN click 
+
+
+% OPTION 2 - CUSTOM Backend for Environment that solves the environment given args 

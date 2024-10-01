@@ -79,7 +79,8 @@ observed(T, true, env(wumpus,L)):- holds(T,env(smell, B)), holds(T, env(smell,B'
 -holds(T,env(assume(pit),L)) :- holds(T,env(breeze, B)), holds(T, env(breeze,B')), adjacent(B,L), adjacent(B',L), B != B', holds(T-1, env(assume(pit), L)), holds(T,in(agent,B)).
 -holds(T,env(assume(wumpus),L)) :- holds(T,env(smell, B)), holds(T, env(smell,B')), adjacent(B,L), adjacent(B',L), B != B', holds(T-1, env(assume(wumpus), L)), holds(T,in(agent,B)).
 
--holds(T,env(assume(wumpus),L)) :- holds(T-1, env(assume(wumpus),L)), holds(_,in(agent,AL)), adjacent(AL,L), holds(T,env(wumpus,WL)), adjacent(AL,WL),WL!=L,: 
+%-holds(T,env(assume(wumpus),L)) :- holds(T-1, env(assume(wumpus),L)), holds(_,in(agent,AL)), adjacent(AL,L), holds(T,env(wumpus,WL)),
+% adjacent(AL,WL),WL!=L, 
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % Update knowledge base
