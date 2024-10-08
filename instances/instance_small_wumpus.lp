@@ -17,4 +17,4 @@ eholds(0, env(gold,(3,3))).
 
 
 
-eholds(0, env(pit,(4,4))).
+%eholds(0, env(pit,(4,4))).

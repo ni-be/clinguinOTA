@@ -22,7 +22,6 @@ env(breeze). env(smell). env(sparkle).
 %%% initial location, based on first return from environment at time 0:
 %holds(T,in(agent,L)) :- holds(T, in(agent, L)), current_time(T). 
 
-holds(0, env(arrow,1)).
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % REALITY CHECK AXIOMS / Occurence-Awareness Axioms
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -112,9 +111,6 @@ observed(T, true, env(wumpus,L))            :- holds(T,env(smell, B)),
                                                holds(T,env(assume(wumpus),L)),  
                                                adjacent(B,L), adjacent(B',L), B != B', 
                                                not holds(T,env(safe,L)).
-
-  
-
 % Observe Pit Related
 %%%%%%%%%%%%%%%%%%%%%%%
 observed(T, false, env(safe,L'))            :- holds(T,env(breeze,L)), 
@@ -149,26 +145,12 @@ observed(T, true, env(pit,L))               :- holds(T,env(breeze, B)),
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % A location that was previous assumed to be a Pit or wumpus is safe, if the adjacent wumpus or pit was identified. 
-holds(T, env(safe,SL))            :- -holds(T, env(assume(wumpus), SL)),  
-                                     holds(T, env(wumpus,WL)), 
+holds(T, env(safe,SL))            :- -holds(T, env(assume(WP), SL)),  
+                                     holds(T, env(WP,WL)), 
                                      not holds(T,env(wall,(WL,SL))),
                                      WL != SL, 
                                      adjacent(WL,SL),  
                                      agent_map(SL).
-                                    
-% Belief that WUMPUS is at WL if there are no more assumed wumpus 
-% locations i.e corner case.
-holds(T, env(wumpus,WL))         :- holds(T,env(assume(wumpus),WL)),
-                                    holds(T,env(smell,SL)),
-                                    not holds(T,env(assume(wumpus),ZL)),                               
-                                    -holds(T,env(assume(wumpus),NA)),
-                                    not holds(T, env(smell,L)),
-                                    holds(T,in(agent,L)),
-                                    adjacent(SL,NA),
-                                    adjacent(L,NA),
-                                    adjacent(SL,WL),
-                                    adjacent(SL,ZL),
-                                    WL != NA, SL != L, ZL != WL. 
 
 -holds(T+1,env(assume(wumpus),L)) :- holds(T,env(smell, S)),
                                      holds(T,env(wumpus,WL)),
@@ -179,21 +161,7 @@ holds(T, env(wumpus,WL))         :- holds(T,env(assume(wumpus),WL)),
                                     
 -holds(T+1,env(assume(wumpus),L)) :- holds(T,env(wumpus,L)), 
                                      holds(T, env(assume(wumpus),L)).
-
-% Belief that WUMPUS is at WL if there are no more assumed wumpus 
-% locations i.e corner case.
-holds(T, env(pit,PL))             :- holds(T,env(assume(pit),PL)),
-                                     holds(T,env(breeze,BL)),
-                                     not holds(T,env(assume(pit),ZL)),                               
-                                     -holds(T,env(assume(pit),NA)),
-                                     not holds(T, env(breeze,L)),
-                                     holds(T,in(agent,L)),
-                                     adjacent(SL,NA),
-                                     adjacent(L,NA),
-                                     adjacent(BL,PL),
-                                     adjacent(BL,ZL),
-                                     PL != NA, BL != L, ZL != PL. 
-
+ 
 -holds(T+1,env(assume(pit),L))    :- holds(T,env(breeze, B)), 
                                      holds(T,env(pit,WL)),  
                                      holds(T, env(assume(pit),L)),
@@ -215,128 +183,94 @@ holds(T,env(E,L))                 :- holds(T-1,env(E,L)),
 
 
 holds(T, env(carry_gold,G))       :- occurs(T,grab_gold(agent,G)). 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% THINK: select an approriate Goal, G
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-holds(T, env(dead_wumpus,W))      :- holds(T, env(wumpus_yell,W)).
+% % IF EMPTY -> explore / move to new field if possible else move back
+% %%%%%%%%%%%%%%%%%%%%%%%
 
--holds(T, env(wumpus,W))          :- holds(T, env(dead_wumpus,W)).
+1{ goal(T,explore,(L,L')): adjacent(L,L'), holds(T, in(agent,L)), holds(T, env(safe,L')), not holds(T, env(wall,(L,L')))} 1:- time(T), not holds(T, env(carry_gold,_)), not goal(T,move_back,_), not goal(T,leave,_).
 
--holds(T+1, env(smell,L))         :- -holds(T,env(wumpus,W)),
-                                     holds(T, env(smell,L)),
-                                     adjacent(W,L).
-                                    
-holds(T,env(safe,W))              :- holds(T, env(dead_wumpus,W)).
+:- goal(T,explore,(L,L')), 
+   holds(T,env(wall,(L,L'))), adjacent(L,L'), holds(T, in(agent,L)).
 
--holds(T+1,env(assume(wumpus),AW)):- holds(T, env(dead_wumpus,W)),
-                                     holds(T, env(smell,SL)),
-                                     holds(T, env(assume(wumpus),AW)),
-                                     adjacent(W,SL), 
-                                     adjacent(AW,SL),
-                                     W != AW.
-                                    
--holds(T+1, env(arrow,N))         :- occurs(T, kill_wumpus(_,_)),
-                                     holds(T, env(arrow,N)), time(T).
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% THINK: select an approriate Goal, G
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% :- goal(T, explore,(L,L')), not holds(T,env(safe,L')).
 
-1{goal(T,F) : possible_goals(T,F)}1 :- time(T). 
-
-possible_goals(T, explore(L,L'))    :- holds(T, in(agent,L)),
-                                       holds(T, env(safe,L')),
-                                       not holds(T,env(wall,(L,L'))),
-                                       not holds(_,in(agent,L')), 
-                                       adjacent(L,L'), 
-                                       time(T).
-
-possible_goals(T, explore(L,L'))    :- holds(T, in(agent,L)),
-                                       holds(T, env(safe,L')),
-                                       holds(_, in(agent,L')),
-                                       not possible_goals(T,_),
-                                       %not possible_goals(T,leave(L,L')),
-                                       not holds(T,env(wall,(L,L'))),
-                                       adjacent(L,L'),
-                                       time(T).
-                                       
-possible_goals(T, backtrack(L,BL)):- holds(T,in(agent,L)), 
-                                       holds(T-1,in(agent,BL)), 
-                                       holds(T,env(safe,BL)), 
-                                       holds(T,env(assume(wumpus),L')),
-                                       holds(T,env(smell,L)),
-                                       not holds(T, env(wumpus,L')),
-                                       not goal(T,leave(_,_)),
-                                       adjacent(L,L'), 
-                                       adjacent(L,BL), 
-                                       time(T), 
-                                       L' != BL.
-                                       
-possible_goals(T, grab_gold(L))     :- holds(T, in(agent,L)),
-                                       holds(T, env(sparkle,L)),
-                                       time(T). 
+:- goal(T,explore,(L,L')), 
+    holds(T-1,in(agent,L')), adjacent(L,L'). %, goal(T-1, move_back,(L',L)). 
 
 
-possible_goals(T, leave(L,L'))      :- holds(T, in(agent,L)),
-                                       %holds(T, env(safe,L')),
-                                       holds(T, env(carry_gold,G)),
-                                       holds(_,in(agent,L')),
-                                       not holds(T,env(wall,(L,L'))),
-                                       adjacent(L,L'),
-                                       time(T).                                        
+% IF SPARKLE -> goal is to grab gold 
+%%%%%%%%%%%%%%%%%%%%%%%
+goal(T,grab_gold,L) :- holds(T,env(sparkle,L)), holds(T,in(agent,L)).
 
-possible_goals(T, escape(L'))       :- holds(T, in(agent,L)),
-                                       holds(T, env(exit,L')), 
-                                       holds(T, env(start,L)), 
-                                       holds(T, env(carry_gold,_)),
-                                       T > 0. 
+% LEAVE ON KNOWN PATH 
+%%%%%%%%%%%%%%%%%%%%%%%
 
+1{ goal(T,leave,(L,L')): adjacent(L,L'), holds(T,env(safe,L')) } 1 :- holds(T, in(agent,L)), holds(T, env(carry_gold,_)). 
 
-possible_goals(T, kill_wumpus((X,Y'),(X,Y)))  :- holds(T, env(wumpus,(X,Y))),
-                                                 holds(T, in(agent,(X,Y'))),
-                                                 holds(T, env(arrow,N)),
-                                                 not holds(T,env(dead_wumpus,(X,Y))),
-                                                 | Y'| - |Y| <= 2,
-                                                 N > 0.
+:- goal(T,leave,(L,L')), 
+   holds(T,env(wall,(L,L'))), 
+   holds(T, in(agent,L)),
+   adjacent(L,L').
 
-possible_goals(T, kill_wumpus((X',Y),(X,Y)))  :- holds(T, env(wumpus,(X,Y))),
-                                                 holds(T, in(agent,(X',Y))),
-                                                 holds(T, env(arrow,N)),
-                                                 not holds(T,env(dead_wumpus,(X,Y))),
-                                                 |X'| - |X| <= 2,
-                                                 N > 0.   
-                                       
+% when leaving go to those room the agent was already in. 
+%:- goal(T,leave,(L,L')), 
+%   not holds(_,in(agent,L')), adjacent(L,L'). 
+   % need to add safe condition in there as well. 
 
+% use manhatten distance to find back to exit
 
-
-:- goal(T,leave((X,Y),(X',Y'))), 
+:- goal(T,leave,((X,Y),(X',Y'))), 
    holds(T,env(exit,(EX,EY))), 
    ND = |X' - EX| + |Y' - EY|, 
    OD = | X-EX| + |Y-EY|, 
    ND > OD.
 
-:- goal(T, leave(_,_)), 
-   not holds(T,env(carry_gold,_)). 
-
-:- goal(T, explore(L,_)), 
-   holds(T,env(carry_gold,G)).
-
-:- goal(T, explore(L,L')), 
-   holds(T-1,in(agent,L')).
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% ACT : Exectute part of the plan: update knowledge base; Back to observe
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Move and Escape
 %%%%%%%%%%%%%%%%%%%%%%%
-occurs(T,move(agent,L,L' ))         :- goal(T,explore(L,L')).
-occurs(T,move(agent,L,L'))          :- goal(T,leave(L,L')). 
-occurs(T,escape(agent,L))           :- goal(T, escape(L)). 
-occurs(T,move(agent,L,L'))          :- goal(T,backtrack(L,L')).
+
+
+goal(T, move_back,(L,BL)) :- holds(T,in(agent,L)), 
+                             holds(T-1,in(agent,BL)), 
+                             holds(T,env(safe,BL)), 
+                             holds(T,env(assume(wumpus),L')),
+                             not holds(T, env(wumpus,L')),
+                             not goal(T,leave,_),
+                             holds(T,env(smell,L)),  
+                             adjacent(L,L'), adjacent(L,BL), time(T), L' != BL.
+
+goal(T, move_back,(L,BL)) :- holds(T,in(agent,L)), 
+                             holds(T-1,in(agent,BL)), 
+                             holds(T,env(safe,BL)), 
+                             holds(T,env(assume(pit),L')),
+                             not holds(T, env(pit,L')),
+                             not goal(T, leave,_),
+                             holds(T, env(breeze,L)),  
+                             adjacent(L,L'), adjacent(L,BL), time(T), L' != BL.
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+% IF Grabbed GOLD + reached exit
+goal(T,escaped(agent,L')) :- occurs(T,move(agent,_,L)),
+                             holds(T,env(exit,L')), 
+                             holds(T, env(start,L)), 
+                             holds(T, env(carry_gold,_)). 
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %% ACT : Exectute part of the plan: update knowledge base; Back to observe
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Move and Escpae
+%%%%%%%%%%%%%%%%%%%%%%%
+occurs(T,move(agent,L,L' ))         :- goal(T,explore,(L,L')), 
+                                       not goal(T, grab_gold, L). 
+occurs(T,move(agent,L,L'))          :- goal(T,leave,  (L,L')), 
+                                       not goal(T, grab_gold, L ).
+occurs(T,escape(agent,L))           :- goal(T, escaped(agent,L)). 
+occurs(T,move(agent,L,L'))          :- goal(T,move_back,(L,L')).
 
 % IF SPARKLE
 %%%%%%%%%%%%%%%%%%%%%%
-occurs(T, grab_gold(agent,L))       :- goal(T, grab_gold(L)). 
+occurs(T, grab_gold(agent,L))       :- goal(T, grab_gold,L). 
 
-% IF KILL WUMPUS
-%%%%%%%%%%%%%%%%%%%%%
-occurs(T, kill_wumpus(A,W))           :- goal(T,kill_wumpus(A,W)).

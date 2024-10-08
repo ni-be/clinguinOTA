@@ -122,5 +122,9 @@ envholds(T, env(start,L))      :- eholds(T,start(L)),
 envholds(T, env(wumpus_yell,W)):- occurs(T-1, kill_wumpus(A,W)),
                                   time(T).
 
+
+
 #show envholds/2.
 #show holds/2.
+#show eholds/2.
+#show -eholds/2.

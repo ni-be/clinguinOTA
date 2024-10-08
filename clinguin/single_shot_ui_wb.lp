@@ -87,7 +87,7 @@ attr(w,class,("d-flex";"flex-row")).
         attr(agent(X,Y), class,("fa-solid";"fa-person-through-window";"fa-2x";"bg-secondary";"bg-opacity-25")) :- holds(T,env(exit,(X,Y))), ctime(T). 
         attr(agent(X,Y), class,("bg-secondary")) :- holds(T, env(start,(X,Y))), ctime(T).
 
-        attr(agent(X,Y), class,("bg-secondary")) :- map((X,Y)), holds(T, in(agent,(X,Y))), ctime(T), not holds(T,env(safe,(X,Y))).
+        attr(agent(X,Y), class,("bg-secondary")) :- agent_map((X,Y)), holds(T, in(agent,(X,Y))), ctime(T), not holds(T,env(safe,(X,Y))).
         
 
        % Observed EMPTY
@@ -112,15 +112,16 @@ attr(w,class,("d-flex";"flex-row")).
         attr(agent(X,Y), class,("bg-warning";"fa-solid"; "fa-hippo";"fa-2x")) :- holds(T,env(wumpus,(X,Y))), ctime(T).
 
         % PIT
-        attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-circle-down";"fa-2x")):- holds(T,env(assume(pit),(X,Y))), ctime(T), not -holds(T,env(assume(pit),(X,Y))).
-        attr(agent(X,Y), class,("bg-warning";"bg-opacity-50";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), ctime(T).
+        attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-circle-down";"fa-2x")):- holds(T,env(assume(pit),(X,Y))), ctime(T).
+        % attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), ctime(T), not holds(_,in(agent,(X,Y))).
+        attr(agent(X,Y), class,("bg-warning";"bg-opacity-50";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), ctime(T), holds(_,in(agent,(X,Y))).
         attr(agent(X,Y), class,("bg-warning";"fa-solid"; "fa-circle-down";"fa-2x")) :- holds(T,env(pit,(X,Y))), ctime(T).
-        attr(agent(X,Y), class,("bg-success";"bg-opacity-25")) :- -holds(T, env(assume(pit),(X,Y))), holds(_,env(assume(pit),(X,Y))), ctime(T). 
+        
         % CURRENT POSITION AT cTIME T
         attr(agent(X,Y), class,("fa-solid";"fa-user";"fa-2x")):- holds(T,in(agent,(X,Y))), ctime(T).
 
         % KNOW SAFE AND ASSUME SAFE
-        attr(agent(X,Y), class,("bg-success";"bg-opacity-25")) :- holds(T,env(safe,(X,Y))), ctime(T),not holds(K,in(agent,(X,Y))),time(K), K <= T, not holds(T,env(wall,((_,_),(X,Y)))). 
+        attr(agent(X,Y), class,("bg-success";"bg-opacity-25")) :- holds(T,env(safe,(X,Y))), ctime(T), agent_map((X,Y)). 
 
         attr(agent(X,Y), class,("bg-success";"bg-opacity-100")) :- holds(K, in(agent,(X,Y))), ctime(T), time(K), K < T.
         
@@ -143,16 +144,19 @@ attr(w,class,("d-flex";"flex-row")).
 elem(menu_bar, menu_bar, w).
 attr(menu_bar, title, "Wumpus Observe Think Act Loop").
 
-% attr(menu_bar, icon, "fa-table-cells").
-%      elem(menu_bar_prev, button, menu_bar):- ctime(T), time(T-1), T > 0.
-%      attr(menu_bar_prev, label, "Previous Time Step"):- ctime(T), time(T-1), T > 0.
-%      attr(menu_bar_prev, icon, "fa-backward-step"):- ctime(T), time(T-1), T > 0.
+attr(menu_bar, icon, "fa-table-cells").
+     elem(menu_bar_prev, button, menu_bar):- ctime(T), time(T-1), T > 0.
+     attr(menu_bar_prev, label, "Previous Time Step"):- ctime(T), time(T-1), T > 0.
+     attr(menu_bar_prev, icon, "fa-backward-step"):- ctime(T), time(T-1), T > 0.
 
-% when(menu_bar_prev, click, call, set_constant("guitime", T-1)):- ctime(T), time(T-1), T > 0.
+when(menu_bar_prev, click, call, set_constant("guitime", T-1)):- ctime(T), time(T-1), T > 0.
 
-      elem(menu_bar_next, button, menu_bar):- ctime(T), time(T+1), max_time(K), T < K.
-      attr(menu_bar_next, label, "Next Time Step"):- ctime(T), time(T+1), max_time(K), T < K. 
-      attr(menu_bar_next, icon, "fa-forward-step"):- ctime(T), time(T+1),max_time(K), T < K.
+     elem(menu_bar_next, button, menu_bar):- ctime(T), time(T+1), max_time(K), T < K.
+     attr(menu_bar_next, label, "Next Time Step"):- ctime(T), time(T+1), max_time(K), T < K. 
+     attr(menu_bar_next, icon, "fa-forward-step"):- ctime(T), time(T+1),max_time(K), T < K.
 
-% when(menu_bar_next, click, call, set_constant("guitime", T+1)):- ctime(T), time(T+1), max_time(K), T < K.
-when(menu_bar_next, click, call, observe(0,occurs(T,move(agent,(1,1),(0,1))))).
+%when(menu_bar_next, click, call, set_constant("guitime", T+1)):- ctime(T), time(T+1), max_time(K), T < K.
+
+when(menu_bar_next, click, call, observe(T)):- ctime(T). 
+
+

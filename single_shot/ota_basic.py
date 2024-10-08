@@ -3,6 +3,8 @@ Single Shot OTA Wumpus Implementation According to the AAA
 
 """
 
+import os
+import argparse
 import time as t
 from clingo import Control
 
@@ -14,7 +16,10 @@ ENV_KNOWLEDGE = []
 
 
 LOAD_ENV = [
-    "instances/inst_move_check.lp",
+    # "instances/instance_small_no_env.lp",
+    # "instances/inst_move_check.lp",
+    "instances/instance_small_wumpus.lp",
+    # "instances/instance_med_wumpus_2pit.lp",
     "single_shot/environment.lp",
 ]
 LOAD_AGENT = [
@@ -81,17 +86,17 @@ def print_debug(ext_time):
 
 
 def clinguin_export():
-    with open("single_shot/data_single_shot_env.lp", "w") as file:
+    with open("single_shot/env_data.lp", "w") as file:
         for atom in ENV_KNOWLEDGE:
             file.write(f"{atom}.\n")
-    with open("single_shot/data_single_shot_agent.lp", "w") as file:
+    with open("single_shot/agent_data.lp", "w") as file:
         for atom in AGENT_KNOWLEDGE:
             file.write(f"{atom}.\n")
 
 
 def single_shot():
     time = 0
-    horizon = 35
+    horizon = 20
 
     exploring = True
 

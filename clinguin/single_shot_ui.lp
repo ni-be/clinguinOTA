@@ -87,7 +87,7 @@ attr(w,class,("d-flex";"flex-row")).
         attr(agent(X,Y), class,("fa-solid";"fa-person-through-window";"fa-2x";"bg-secondary";"bg-opacity-25")) :- holds(T,env(exit,(X,Y))), ctime(T). 
         attr(agent(X,Y), class,("bg-secondary")) :- holds(T, env(start,(X,Y))), ctime(T).
 
-        attr(agent(X,Y), class,("bg-secondary")) :- map((X,Y)), holds(T, in(agent,(X,Y))), ctime(T), not holds(T,env(safe,(X,Y))).
+        attr(agent(X,Y), class,("bg-secondary")) :- agent_map((X,Y)), holds(T, in(agent,(X,Y))), ctime(T), not holds(T,env(safe,(X,Y))).
         
 
        % Observed EMPTY
@@ -112,15 +112,16 @@ attr(w,class,("d-flex";"flex-row")).
         attr(agent(X,Y), class,("bg-warning";"fa-solid"; "fa-hippo";"fa-2x")) :- holds(T,env(wumpus,(X,Y))), ctime(T).
 
         % PIT
-        attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-circle-down";"fa-2x")):- holds(T,env(assume(pit),(X,Y))), ctime(T), not -holds(T,env(assume(pit),(X,Y))).
-        attr(agent(X,Y), class,("bg-warning";"bg-opacity-50";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), ctime(T).
+        attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-circle-down";"fa-2x")):- holds(T,env(assume(pit),(X,Y))), ctime(T).
+        % attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), ctime(T), not holds(_,in(agent,(X,Y))).
+        attr(agent(X,Y), class,("bg-warning";"bg-opacity-50";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), ctime(T), holds(_,in(agent,(X,Y))).
         attr(agent(X,Y), class,("bg-warning";"fa-solid"; "fa-circle-down";"fa-2x")) :- holds(T,env(pit,(X,Y))), ctime(T).
-        attr(agent(X,Y), class,("bg-success";"bg-opacity-25")) :- -holds(T, env(assume(pit),(X,Y))), holds(_,env(assume(pit),(X,Y))), ctime(T). 
+        
         % CURRENT POSITION AT cTIME T
         attr(agent(X,Y), class,("fa-solid";"fa-user";"fa-2x")):- holds(T,in(agent,(X,Y))), ctime(T).
 
         % KNOW SAFE AND ASSUME SAFE
-        attr(agent(X,Y), class,("bg-success";"bg-opacity-25")) :- holds(T,env(safe,(X,Y))), ctime(T),not holds(K,in(agent,(X,Y))),time(K), K <= T, not holds(T,env(wall,((_,_),(X,Y)))). 
+        attr(agent(X,Y), class,("bg-success";"bg-opacity-25")) :- holds(T,env(safe,(X,Y))), ctime(T), agent_map((X,Y)). 
 
         attr(agent(X,Y), class,("bg-success";"bg-opacity-100")) :- holds(K, in(agent,(X,Y))), ctime(T), time(K), K < T.
         
