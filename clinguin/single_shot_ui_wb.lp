@@ -12,56 +12,56 @@ attr(w,class,("d-flex";"flex-row")).
 
 
 
-    %%%%%%%%%%%%%%%%%%%%%%%%
-    % env knowledge
-    %%%%%%%%%%%%%%%%%%%%%%%%
-    elem(ota,container,w).
-    attr(ota,child_layout,grid).
+   %  %%%%%%%%%%%%%%%%%%%%%%%%
+   %  % env knowledge
+   %  %%%%%%%%%%%%%%%%%%%%%%%%
+   %  elem(ota,container,w).
+   %  attr(ota,child_layout,grid).
  
-   %attr(ota,height,200).
+   % %attr(ota,height,200).
 
-        %%%%%%%%%%%%%%%%%%%%%%%%
-        % Environment Cont.
-        %%%%%%%%%%%%%%%%%%%%%%%%
-        elem(env(X,Y),container,ota):-map((X,Y)).
-        attr(env(X,Y),width,50):-map((X,Y)).
-        attr(env(X,Y),height,50):-map((X,Y)).
-        attr(env(X,Y),grid_column,X):-map((X,Y)).
-        attr(env(X,Y),grid_row,Y):-map((X,Y)).
-        attr(env(X,Y),class,("m-1")):-map((X,Y)).
+   %      %%%%%%%%%%%%%%%%%%%%%%%%
+   %      % Environment Cont.
+   %      %%%%%%%%%%%%%%%%%%%%%%%%
+   %      elem(env(X,Y),container,ota):-map((X,Y)).
+   %      attr(env(X,Y),width,50):-map((X,Y)).
+   %      attr(env(X,Y),height,50):-map((X,Y)).
+   %      attr(env(X,Y),grid_column,X):-map((X,Y)).
+   %      attr(env(X,Y),grid_row,Y):-map((X,Y)).
+   %      attr(env(X,Y),class,("m-1")):-map((X,Y)).
         
 
-        % Environment Grid
-        attr(env(X,Y), class,("bg-info";"bg-opacity-25")) :- map((X,Y)), not eholds(T, env(_,(X,Y) )),ctime(T), not holds(T,env(exit,(X,Y))).
-        attr(env(X,Y), class,("bg-info";"bg-opacity-50")) :- cave((X,Y)), 
-                                                             not eholds(T, env(agent,(X,Y))), ctime(T),  
-                                                             not holds(T, env(start,(X,Y))). 
+   %      % Environment Grid
+   %      attr(env(X,Y), class,("bg-info";"bg-opacity-25")) :- map((X,Y)), not eholds(T, env(_,(X,Y) )),ctime(T), not holds(T,env(exit,(X,Y))).
+   %      attr(env(X,Y), class,("bg-info";"bg-opacity-50")) :- cave((X,Y)), 
+   %                                                           not eholds(T, env(agent,(X,Y))), ctime(T),  
+   %                                                           not holds(T, env(start,(X,Y))). 
                                       
-        % Start and Exit Point 
-        attr(env(X,Y), class,("fa-solid";"fa-person-through-window";"fa-2x";"bg-secondary";"bg-opacity-25")) :- holds(T,env(exit,(X,Y))), ctime(T). 
-        attr(env(X,Y), class,("bg-secondary")) :- holds(0, env(start,(X,Y))), ctime(T).
+   %      % Start and Exit Point 
+   %      attr(env(X,Y), class,("fa-solid";"fa-person-through-window";"fa-2x";"bg-secondary";"bg-opacity-25")) :- holds(T,env(exit,(X,Y))), ctime(T). 
+   %      attr(env(X,Y), class,("bg-secondary")) :- holds(0, env(start,(X,Y))), ctime(T).
 
         
-        %outside walls
-        attr(env(X,Y), class,("fa-solid";"fa-circle-down";"fa-2x")) :- eholds(T, env(pit,(X,Y))), map((X,Y)), ctime(T).
-        attr(env(X,Y), class,("fa-solid";"fa-hippo";"fa-2x")) :- eholds(T, env(wumpus,(X,Y))), map((X,Y)), ctime(T).
-        attr(env(X,Y), class,("fa-solid";"fa-gem";"fa-2x")) :- eholds(T, env(gold, (X,Y))), map((X,Y)), ctime(T).
-        attr(env(X,Y), class,("fa-solid";"fa-user";"fa-2x")) :- holds(T,in(agent,(X,Y))), map((X,Y)), ctime(T).
+   %      %outside walls
+   %      attr(env(X,Y), class,("fa-solid";"fa-circle-down";"fa-2x")) :- eholds(T, env(pit,(X,Y))), map((X,Y)), ctime(T).
+   %      attr(env(X,Y), class,("fa-solid";"fa-hippo";"fa-2x")) :- eholds(T, env(wumpus,(X,Y))), map((X,Y)), ctime(T).
+   %      attr(env(X,Y), class,("fa-solid";"fa-gem";"fa-2x")) :- eholds(T, env(gold, (X,Y))), map((X,Y)), ctime(T).
+   %      attr(env(X,Y), class,("fa-solid";"fa-user";"fa-2x")) :- holds(T,in(agent,(X,Y))), map((X,Y)), ctime(T).
     
-        % room the agent visited
-        attr(env(X,Y), class,("bg-success")) :- holds(K, in(agent,(X,Y))), map((X,Y)), ctime(T),time(K), K <= T, not holds(T,env(start,(X,Y))).
+   %      % room the agent visited
+   %      attr(env(X,Y), class,("bg-success")) :- holds(K, in(agent,(X,Y))), map((X,Y)), ctime(T),time(K), K <= T, not holds(T,env(start,(X,Y))).
 
-        % ENV EFFECTS
+   %      % ENV EFFECTS
 
-        attr(env(X,Y), class,("fa-solid";"fa-wind";"fa-2x")) :- eholds(T, env(breeze,(X,Y))), map((X,Y)), ctime(T).
-        attr(env(X,Y), class,("fa-solid";"fa-biohazard";"fa-2x")) :- eholds(T, env(smell,(X,Y))), map((X,Y)), ctime(T).
-        attr(env(X,Y), class,("bg-warning")) :- eholds(T, env(sparkle,(X,Y))), map((X,Y)), ctime(T).
+   %      attr(env(X,Y), class,("fa-solid";"fa-wind";"fa-2x")) :- eholds(T, env(breeze,(X,Y))), map((X,Y)), ctime(T).
+   %      attr(env(X,Y), class,("fa-solid";"fa-biohazard";"fa-2x")) :- eholds(T, env(smell,(X,Y))), map((X,Y)), ctime(T).
+   %      attr(env(X,Y), class,("bg-warning")) :- eholds(T, env(sparkle,(X,Y))), map((X,Y)), ctime(T).
 
-        % WALLS
-        attr(env(X,Y), class,("border-bottom";"border-dark";"border-3")) :- eholds(0,env(wall,((X,Y),(X,Y')))), Y' > Y.
-        attr(env(X,Y), class,("border-top";"border-dark";"border-3")) :- eholds(0,env(wall,((X,Y),(X,Y')))), Y' < Y.
-        attr(env(X,Y), class,("border-end";"border-dark";"border-3")) :- eholds(0,env(wall,((X,Y),(X',Y)))), X' > X.
-        attr(env(X,Y), class,("border-start";"border-dark";"border-3")) :- eholds(0,env(wall,((X,Y),(X',Y)))), X' < X.
+   %      % WALLS
+   %      attr(env(X,Y), class,("border-bottom";"border-dark";"border-3")) :- eholds(0,env(wall,((X,Y),(X,Y')))), Y' > Y.
+   %      attr(env(X,Y), class,("border-top";"border-dark";"border-3")) :- eholds(0,env(wall,((X,Y),(X,Y')))), Y' < Y.
+   %      attr(env(X,Y), class,("border-end";"border-dark";"border-3")) :- eholds(0,env(wall,((X,Y),(X',Y)))), X' > X.
+   %      attr(env(X,Y), class,("border-start";"border-dark";"border-3")) :- eholds(0,env(wall,((X,Y),(X',Y)))), X' < X.
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,65 +71,108 @@ attr(w,class,("d-flex";"flex-row")).
     attr(ota_agent,child_layout,grid).
     attr(ota_agent,title, "Agent Live Tracking").
 
-        % %%%%%%%%%%%%%%%%%%%%%%%%
-        % % Agent Container.
-        % %%%%%%%%%%%%%%%%%%%%%%%%
+        %%%%%%%%%%%%%%%%%%%%%%%%%
+        % Agent Container.
+        %%%%%%%%%%%%%%%%%%%%%%%%%
 
-        elem(agent(X,Y),container,ota_agent):-map((X,Y)).
-        attr(agent(X,Y),width,50):-map((X,Y)).
-        attr(agent(X,Y),height,50):-map((X,Y)).
-        attr(agent(X,Y),grid_column,X):-map((X,Y)).
-        attr(agent(X,Y),grid_row,Y):-map((X,Y)).
-        attr(agent(X,Y),class,("m-1")):-map((X,Y)).
-        attr(person(P), label, P):- person(P,_).
-        % Basic Grid
-
-        attr(agent(X,Y), class,("fa-solid";"fa-person-through-window";"fa-2x";"bg-secondary";"bg-opacity-25")) :- holds(T,env(exit,(X,Y))), ctime(T). 
-        attr(agent(X,Y), class,("bg-secondary")) :- holds(T, env(start,(X,Y))), ctime(T).
-
-        attr(agent(X,Y), class,("bg-secondary")) :- agent_map((X,Y)), holds(T, in(agent,(X,Y))), ctime(T), not holds(T,env(safe,(X,Y))).
+        elem(agent(X,Y),container,ota_agent) :- gui(map((X,Y))).
+        attr(agent(X,Y),width,50)            :- gui(map((X,Y))).
+        attr(agent(X,Y),height,50)           :- gui(map((X,Y))).
+        attr(agent(X,Y),grid_column,X)       :- gui(map((X,Y))).
+        attr(agent(X,Y),grid_row,Y)          :- gui(map((X,Y))).
+        attr(agent(X,Y),class,("m-1"))       :- gui(map((X,Y))).
         
-
-       % Observed EMPTY
-        attr(agent(X,Y), class,("fa-solid";"fa-e")) :- holds(T,env(empty,(X,Y))), ctime(T).
+        %%%%%%%%%%%%%%%%%%%%
+        % AGENT KNOWN MAP
+        %%%%%%%%%%%%%%%%%%%%%
+        attr(agent(X,Y),class,("fa-solid";"fa-person-through-window";"fa-2x";"bg-secondary";"bg-opacity-25")) 
+                                                                        :- holds(T,env(exit,(X,Y))), ctime(T). 
         
-      % observed Smell and confirmed Wumpus
-      % observed WALLS
-        attr(agent(X,Y), class,("border-bottom";"border-dark";"border-3")) :- holds(T, env(wall,((X,Y),(X,Y')))), Y' > Y, ctime(T).
-        attr(agent(X,Y), class,("border-top";"border-dark";"border-3")) :- holds(T, env(wall,((X,Y),(X,Y')))), Y' < Y, ctime(T).
-        attr(agent(X,Y), class,("border-end";"border-dark";"border-3")) :- holds(T, env(wall,((X,Y),(X',Y)))), X' > X, ctime(T).
-        attr(agent(X,Y), class,("border-start";"border-dark";"border-3")) :- holds(T, env(wall,((X,Y),(X',Y)))), X' < X, ctime(T).
+        attr(agent(X,Y),class,("bg-secondary"))                         :- holds(T,env(start,(X,Y))), ctime(T).
 
-
-       % Hold believe that 
-
-        attr(agent(X,Y), class,("bg-success";"fa-solid";"fa-gem";"fa-2x")) :- holds(T,env(sparkle,(X,Y))), ctime(T).
-        attr(agent(X,Y), class,("bg-success";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), ctime(T).
+        attr(agent(X,Y), class,("bg-secondary"))                        :- agent_map((X,Y)), 
+                                                                           holds(T,in(agent,(X,Y))), 
+                                                                           ctime(T), 
+                                                                           not holds(T,env(safe,(X,Y))).
         
-        % WUMPUS
-        attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-hippo";"fa-2x")):- holds(T,env(assume(wumpus),(X,Y))), ctime(T).
-        attr(agent(X,Y), class,("bg-warning";"bg-opacity-50";"fa-solid";"fa-biohazard";"fa-2x")) :- holds(T,env(smell,(X,Y))), ctime(T).
-        attr(agent(X,Y), class,("bg-warning";"fa-solid"; "fa-hippo";"fa-2x")) :- holds(T,env(wumpus,(X,Y))), ctime(T).
+        %%%%%%%%%%%%%%%%%%%%
+        % OBSERVATIONS
+        %%%%%%%%%%%%%%%%%%%%
 
-        % PIT
-        attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-circle-down";"fa-2x")):- holds(T,env(assume(pit),(X,Y))), ctime(T).
-        % attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), ctime(T), not holds(_,in(agent,(X,Y))).
-        attr(agent(X,Y), class,("bg-warning";"bg-opacity-50";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), ctime(T), holds(_,in(agent,(X,Y))).
-        attr(agent(X,Y), class,("bg-warning";"fa-solid"; "fa-circle-down";"fa-2x")) :- holds(T,env(pit,(X,Y))), ctime(T).
+        %%% EMPTY
+        %-------------------
+        attr(agent(X,Y), class,("fa-solid";"fa-e"))                       :- holds(T,env(empty,(X,Y))), 
+                                                                             ctime(T).
+        %%% WALLS
+        %---------------------
+        attr(agent(X,Y), class,("border-bottom";"border-dark";"border-3")):- holds(T,env(wall,((X,Y),(X,Y')))), 
+                                                                             Y' > Y, ctime(T).
+                                                                            
+        attr(agent(X,Y), class,("border-top";"border-dark";"border-3"))    :- holds(T,env(wall,((X,Y),(X,Y')))), 
+                                                                              Y' < Y, ctime(T).
+                                                                              
+        attr(agent(X,Y), class,("border-end";"border-dark";"border-3"))    :- holds(T,env(wall,((X,Y),(X',Y)))),
+                                                                              X' > X, ctime(T).
+                                                                              
+        attr(agent(X,Y), class,("border-start";"border-dark";"border-3"))  :- holds(T,env(wall,((X,Y),(X',Y)))), 
+                                                                              X' < X, ctime(T).
+
+        %%% WUMPUS
+        %-----------------------        
+        attr(agent(X,Y), class,("bg-warning";"bg-opacity-50";"fa-solid";"fa-biohazard";"fa-2x")) 
+                                                                            :- holds(T,env(smell,(X,Y))),
+                                                                               ctime(T).
+    
+        attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-hippo";"fa-2x"))
+                                                                            :- holds(T,env(assume(wumpus),(X,Y))),
+                                                                               ctime(T).
+          
+        attr(agent(X,Y), class,("bg-warning";"fa-solid"; "fa-hippo";"fa-2x")) 
+                                                                            :- holds(T,env(wumpus,(X,Y))), 
+                                                                               ctime(T).
+        %%% PIT
+        %------------------------
+        attr(agent(X,Y), class,("bg-warning";"bg-opacity-50";"fa-solid";"fa-wind";"fa-2x")) 
+                                                                             :- holds(T,env(breeze,(X,Y))), 
+                                                                                ctime(T).
+                                                                                %??holds(_,in(agent,(X,Y))).
+    
+        attr(agent(X,Y), class,("bg-warning";"bg-opacity-25";"fa-solid";"fa-circle-down";"fa-2x"))
+                                                                            :- holds(T,env(assume(pit),(X,Y))), 
+                                                                               ctime(T).
         
-        % CURRENT POSITION AT cTIME T
-        attr(agent(X,Y), class,("fa-solid";"fa-user";"fa-2x")):- holds(T,in(agent,(X,Y))), ctime(T).
+        attr(agent(X,Y), class,("bg-warning";"fa-solid"; "fa-circle-down";"fa-2x")) 
+                                                                            :- holds(T,env(pit,(X,Y))), 
+                                                                               ctime(T).
 
-        % KNOW SAFE AND ASSUME SAFE
-        attr(agent(X,Y), class,("bg-success";"bg-opacity-25")) :- holds(T,env(safe,(X,Y))), ctime(T), agent_map((X,Y)). 
+        %%% SPARKLE
+        %---------------------------
+        attr(agent(X,Y), class,("bg-success";"fa-solid";"fa-gem";"fa-2x"))   :- holds(T,env(sparkle,(X,Y))), 
+                                                                                ctime(T).
 
-        attr(agent(X,Y), class,("bg-success";"bg-opacity-100")) :- holds(K, in(agent,(X,Y))), ctime(T), time(K), K < T.
+        %%% SAFETY
+        %---------------------------
+        attr(agent(X,Y), class,("bg-success";"bg-opacity-25"))   :- holds(T,env(safe,(X,Y))), 
+                                                                    ctime(T), agent_map((X,Y)). 
+
+        attr(agent(X,Y), class,("bg-success";"bg-opacity-100"))   :- holds(K,in(agent,(X,Y))), 
+                                                                     ctime(T), time(K), K < T.
         
+        %%% AGENT POSITION AT time T
+        %---------------------------
+        attr(agent(X,Y), class,("fa-solid";"fa-user";"fa-2x"))    :- holds(T,in(agent,(X,Y))), 
+                                                                     ctime(T).
+
+       
  
-      elem(dropdown, dropdown_menu, w).
-      elem(dropdown(A), dropdown_menu_item, dropdown) :- _any(occurs(T,A)).
-      attr(dropdown(A), label, occurs(T,A) ) :- _any(occurs(T,A)).
-      when(dropdown(A), click, call, agent_action(occurs(T,A)) ) :- _any(occurs(T,A)).  
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                %%% DROPDOWN MENU 
+                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      %elem(dropdown, dropdown_menu, w).
+      %elem(dropdown(A), dropdown_menu_item, dropdown)　:- _any(occurs(T,A)).
+      %attr(dropdown(A), label, occurs(T,A) ) 　　　　　:- _any(occurs(T,A)).
+      %when(dropdown(A), click, call, agent_action(occurs(T,A)) ) :- _any(occurs(T,A)).  
+      
       
       
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -167,8 +210,15 @@ when(menu_bar_prev, click, call, set_constant("guitime", T-1)):- ctime(T), time(
      attr(menu_bar_next, label, "Next Time Step"). %:- ctime(T), time(T+1), max_time(K), T < K, T != K. 
      attr(menu_bar_next, icon, "fa-forward-step"). %:- ctime(T), time(T+1),max_time(K), T < K, T != K.
 
-%when(menu_bar_next, click, call, set_constant("guitime", T+1)):- ctime(T), time(T+1), max_time(K), T < K.
-
-when(menu_bar_next, click, call):- ctime(T). 
+when(menu_bar_next, click, call, set_constant("guitime", T+1)):- ctime(T), time(T+1), max_time(K), T < K.
 
 
+
+
+%% GRAVEYARD
+%%?????? Why keep?
+% %Hold believe that 
+% attr(agent(X,Y), class,("bg-success";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), ctime(T).
+        
+       
+ 

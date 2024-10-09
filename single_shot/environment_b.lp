@@ -135,10 +135,11 @@ envholds(T, env(start,L))      :- eholds(T,start(L)),
 envholds(T, env(wumpus_yell,W)):- occurs(T-1, kill_wumpus(A,W)),
                                   time(T).
 
+gui(map(L)) :- map(L).
 
 #show envholds/2.
 #show holds/2.
-#show eholds/2.
-#show -eholds/2.
-#show map/1.
-#show cave/1.
+%#show eholds/2.
+%#show -eholds/2.
+#show gui/1.
+
