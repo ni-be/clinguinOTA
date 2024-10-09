@@ -16,5 +16,3 @@ eholds(0, env(gold,(4,4))).
 
 
 
-eholds(0, env(wumpus,(10,10))).
-eholds(0, env(pit,(11,11))).

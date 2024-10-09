@@ -20,7 +20,7 @@ LOAD_ENV = [
     # "instances/inst_move_check.lp",
     "instances/instance_small_wumpus.lp",
     # "instances/instance_med_wumpus_2pit.lp",
-    "single_shot/environment.lp",
+    "single_shot/environment_b.lp",
 ]
 LOAD_AGENT = [
     "single_shot/agent.lp",

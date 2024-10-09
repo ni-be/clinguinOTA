@@ -125,17 +125,29 @@ attr(w,class,("d-flex";"flex-row")).
 
         attr(agent(X,Y), class,("bg-success";"bg-opacity-100")) :- holds(K, in(agent,(X,Y))), ctime(T), time(K), K < T.
         
+ 
+      elem(dropdown, dropdown_menu, w).
+      elem(dropdown(A), dropdown_menu_item, dropdown) :- _any(occurs(T,A)).
+      attr(dropdown(A), label, occurs(T,A) ) :- _any(occurs(T,A)).
+      when(dropdown(A), click, call, agent_action(occurs(T,A)) ) :- _any(occurs(T,A)).  
+      
+      
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       %%% INFO CONTAINER %%%%
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       elem(info, container, w).
-      elem(goal(T,A,L), button, info):- goal(T,A,L), ctime(T).
-      attr(goal(T,A,L), label, goal(T,A,L) ):- goal(T,A,L), ctime(T).
-      attr(goal(T,A,L), class, ("bg-info";"m-2";"btn-sm")):- goal(T,A,L), ctime(T).
+      elem(occurs(T,A), button, info):- occurs(T,A), ctime(T).
+      attr(occurs(T,A), label, occurs(T,A) ):- occurs(T,A), ctime(T).
+      attr(occurs(T,A), class, ("bg-info";"m-2";"btn-sm")):- occurs(T,A), ctime(T).
+      attr(occurs(T,A), class, ("bg-primary";"m-2";"btn-sm")) :- _any(occurs(T,A)), occurs(T,A), ctime(T).
+      
+      
       elem(info_env, container, w).
       elem(env_info(E,L), button, info_env):- envholds(T,env(E,L)), ctime(T). 
       attr(env_info(E,L), label, env_info(E,L)):- envholds(T,env(E,L)), ctime(T).
       attr(env_info(E,L), class, ("bg-primary";"m-2";"btn-sm")):- envholds(T,env(E,L)), ctime(T).
+
+     
       
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -151,12 +163,12 @@ attr(menu_bar, icon, "fa-table-cells").
 
 when(menu_bar_prev, click, call, set_constant("guitime", T-1)):- ctime(T), time(T-1), T > 0.
 
-     elem(menu_bar_next, button, menu_bar):- ctime(T), time(T+1), max_time(K), T < K.
-     attr(menu_bar_next, label, "Next Time Step"):- ctime(T), time(T+1), max_time(K), T < K. 
-     attr(menu_bar_next, icon, "fa-forward-step"):- ctime(T), time(T+1),max_time(K), T < K.
+     elem(menu_bar_next, button, menu_bar). %:- ctime(T), time(T+1), max_time(K), T < K, T != K.
+     attr(menu_bar_next, label, "Next Time Step"). %:- ctime(T), time(T+1), max_time(K), T < K, T != K. 
+     attr(menu_bar_next, icon, "fa-forward-step"). %:- ctime(T), time(T+1),max_time(K), T < K, T != K.
 
 %when(menu_bar_next, click, call, set_constant("guitime", T+1)):- ctime(T), time(T+1), max_time(K), T < K.
 
-when(menu_bar_next, click, call, observe(T)):- ctime(T). 
+when(menu_bar_next, click, call):- ctime(T). 
 
 

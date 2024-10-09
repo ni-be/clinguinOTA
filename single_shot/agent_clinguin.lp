@@ -241,54 +241,53 @@ holds(T,env(safe,W))              :- holds(T, env(dead_wumpus,W)).
 
 %1{goal(T,F) : possible_goals(T,F)}1 :- time(T). 
 
-1 { occurs(T,A) : action(T,A)  }1 :- time(T).
 
-action(T, explore(L,L'))               :- holds(T, in(agent,L)),
+occurs(T, explore(L,L'))               :- holds(T, in(agent,L)),
                                        holds(T, env(safe,L')),
                                        not holds(T,env(wall,(L,L'))),
                                        not holds(_,in(agent,L')), 
                                        adjacent(L,L'), 
                                        time(T).
 
-action(T, move(L,L'))               :- holds(T, in(agent,L)),
+occurs(T, move(L,L'))               :- holds(T, in(agent,L)),
                                        holds(T, env(safe,L')),
                                        holds(_, in(agent,L')),
-                                       not action(T,_),
-                                       %not action(T,leave(L,L')),
+                                       not occurs(T,_),
+                                       %not occurs(T,leave(L,L')),
                                        not holds(T,env(wall,(L,L'))),
                                        adjacent(L,L'),
                                        time(T).
                                        
-action(T, backtrack(L,BL))          :- holds(T,in(agent,L)), 
+occurs(T, backtrack(L,BL))          :- holds(T,in(agent,L)), 
                                        holds(T-1,in(agent,BL)), 
                                        holds(T,env(safe,BL)), 
                                        holds(T,env(assume(wumpus),L')),
                                        holds(T,env(smell,L)),
                                        not holds(T, env(wumpus,L')),
-                                       not action(T,leave(_,_)),
+                                       not occurs(T,leave(_,_)),
                                        adjacent(L,L'), 
                                        adjacent(L,BL), 
                                        time(T), 
                                        L' != BL.
                                        
-action(T, backtrack(L,BL))          :- holds(T,in(agent,L)), 
+occurs(T, backtrack(L,BL))          :- holds(T,in(agent,L)), 
                                        holds(T-1,in(agent,BL)), 
                                        holds(T,env(safe,BL)), 
                                        holds(T,env(assume(pit),L')),
                                        holds(T,env(breeze,L)),
                                        not holds(T, env(pit,L')),
-                                       not action(T,leave(_,_)),
+                                       not occurs(T,leave(_,_)),
                                        adjacent(L,L'), 
                                        adjacent(L,BL), 
                                        time(T), 
                                        L' != BL.
 
-action(T, grab_gold(L))             :- holds(T, in(agent,L)),
+occurs(T, grab_gold(L))             :- holds(T, in(agent,L)),
                                        holds(T, env(sparkle,L)),
                                        time(T). 
 
 
-action(T, leave(L,L'))              :- holds(T, in(agent,L)),
+occurs(T, leave(L,L'))              :- holds(T, in(agent,L)),
                                        %holds(T, env(safe,L')),
                                        holds(T, env(carry_gold,G)),
                                        holds(_,in(agent,L')),
@@ -296,21 +295,21 @@ action(T, leave(L,L'))              :- holds(T, in(agent,L)),
                                        adjacent(L,L'),
                                        time(T).                                        
 
-action(T, escape(L'))               :- holds(T, in(agent,L)),
+occurs(T, escape(L'))               :- holds(T, in(agent,L)),
                                        holds(T, env(exit,L')), 
                                        holds(T, env(start,L)), 
                                        holds(T, env(carry_gold,_)),
                                        T > 0. 
 
 
-action(T, kill_wumpus((X,Y'),(X,Y)))          :- holds(T, env(wumpus,(X,Y))),
+occurs(T, kill_wumpus((X,Y'),(X,Y)))          :- holds(T, env(wumpus,(X,Y))),
                                                  holds(T, in(agent,(X,Y'))),
                                                  holds(T, env(arrow,N)),
                                                  not holds(T,env(dead_wumpus,(X,Y))),
                                                  | Y'| - |Y| <= 2,
                                                  N > 0.
 
-action(T, kill_wumpus((X',Y),(X,Y)))          :- holds(T, env(wumpus,(X,Y))),
+occurs(T, kill_wumpus((X',Y),(X,Y)))          :- holds(T, env(wumpus,(X,Y))),
                                                  holds(T, in(agent,(X',Y))),
                                                  holds(T, env(arrow,N)),
                                                  not holds(T,env(dead_wumpus,(X,Y))),

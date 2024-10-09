@@ -46,23 +46,36 @@ eholds(0,env(wall,(W,WW)))     :- wall(W,WW).
 eholds(0,env(wall,(W,WW)))     :- wall(WW,W).
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% OBSERVE / GET INPUT
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Extra Current Location data after agent perfomed an action:
-holds(T,in(agent, L))          :- occurs(T-1, move(agent,OL, L)), 
+
+holds(T,in(agent, L))          :- occurs(T-1, explore(OL, L)), 
+                                  time(T).
+holds(T,in(agent, L))          :- occurs(T-1, move(OL, L)), 
                                   time(T).
                                    
-holds(T,in(agent,L))           :- occurs(T-1, grab_gold(agent,L)), 
+holds(T,in(agent,L))           :- occurs(T-1, grab_gold(L)), 
                                   time(T).
 
 holds(T, in(agent,A))          :- occurs(T-1, kill_wumpus(A,L)),
                                   time(T).
 
+holds(T, in(agent,A))          :- occurs(T-1, leave(OL,A)),
+                                  time(T).
+
+%holds(T, in(agent,A))          :- occurs(T-1, escape(A)),
+%                                  time(T).
+holds(T, in(agent,A))          :- occurs(T-1, backtrack(L,A)),
+                                  time(T).
+
 eholds(T,env(agent,L))         :- holds(T,in(agent,L)).
 
-
+%dummy to avoid warning!
+occurs(-1000, dummy(-1000)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THINK / UPDATE KNOWLEDGE
@@ -79,11 +92,11 @@ eholds(T,env(E,L))             :- eholds(T-1,env(E,L)),
 
 % After the agent grabed gold 
 -eholds(T, env(gold,G))        :- eholds(T-1, env(gold,G)), 
-                                  occurs(T-1,grab_gold(agent,G)), 
+                                  occurs(T-1,grab_gold(G)), 
                                   time(T).
                                    
 -eholds(T, env(sparkle,G))     :- eholds(T-1, env(sparkle,G)), 
-                                  occurs(T-1,grab_gold(agent,G)), 
+                                  occurs(T-1,grab_gold(G)), 
                                   time(T).
 
 -eholds(T, env(wumpus,W))      :- eholds(T-1, env(wumpus,W)),
@@ -123,8 +136,9 @@ envholds(T, env(wumpus_yell,W)):- occurs(T-1, kill_wumpus(A,W)),
                                   time(T).
 
 
-
 #show envholds/2.
 #show holds/2.
 #show eholds/2.
 #show -eholds/2.
+#show map/1.
+#show cave/1.

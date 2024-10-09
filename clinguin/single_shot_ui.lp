@@ -129,9 +129,11 @@ attr(w,class,("d-flex";"flex-row")).
       %%% INFO CONTAINER %%%%
       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       elem(info, container, w).
-      elem(goal(T,A,L), button, info):- goal(T,A,L), ctime(T).
-      attr(goal(T,A,L), label, goal(T,A,L) ):- goal(T,A,L), ctime(T).
-      attr(goal(T,A,L), class, ("bg-info";"m-2";"btn-sm")):- goal(T,A,L), ctime(T).
+      elem(poccurs(T,A), button, info):- poccurs(T,A), ctime(T).
+      attr(poccurs(T,A), label, occurs(T,A) ):- poccurs(T,A), ctime(T).
+      attr(poccurs(T,A), class, ("bg-info";"m-2";"btn-sm")):- poccurs(T,A), ctime(T).
+      attr(poccurs(T,A), class, ("bg-primary";"m-2";"btn-sm")) :- occurs(T,A), poccurs(T,A), ctime(T).
+      
       elem(info_env, container, w).
       elem(env_info(E,L), button, info_env):- envholds(T,env(E,L)), ctime(T). 
       attr(env_info(E,L), label, env_info(E,L)):- envholds(T,env(E,L)), ctime(T).
