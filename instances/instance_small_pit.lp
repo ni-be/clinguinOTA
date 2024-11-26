@@ -11,7 +11,7 @@ wall((X,Y),(X',Y)) :- cave((X,Y)), map((X',Y)), not cave((X',Y)), |X-X'| == 1, n
 eholds(0, start((1,1))).
 eholds(0, exit((0,1))).
  
-eholds(0, env(pit,(2,1))).
+eholds(0, env(pit,(1,3))).
 eholds(0, env(gold,(3,3))).
 
 
