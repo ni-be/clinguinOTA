@@ -1,5 +1,9 @@
+#program base.
+
+
 % AGENT ENCODING WUMPUS
 current_time(T) :- T = #max{T2 : time(T2)}.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % WORLD RULES
@@ -12,17 +16,18 @@ adjacent((X,Y),(X+DX,Y+DY)) :- agent_map((X,Y)),
                                %Y+DY = Y', 
                                %DX != DY.
 
+env(breeze). env(smell). env(sparkle).
+
+
+
 agent_map(L)           :- holds(T,in(agent,L)).
 agent_map((X+DX,Y+DY)) :- holds(T,in(agent,(X,Y))),
                           dir((DX,DY)). 
 
 env(breeze). env(smell). env(sparkle).  
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%% initial location, based on first return from environment at time 0:
-%holds(T,in(agent,L)) :- holds(T, in(agent, L)), current_time(T). 
-
 holds(0, env(arrow,1)).
+
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % REALITY CHECK AXIOMS / Occurence-Awareness Axioms
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -260,14 +265,19 @@ holds(T,env(safe,W))              :- holds(T, env(dead_wumpus,W)).
                                     
 -holds(T+1, env(arrow,N))         :- occurs(T, kill_wumpus(_,_)),
                                      holds(T, env(arrow,N)), time(T).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% THINK: select an approriate Goal, G
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% 1{occurs(T,A): action(T,A), time(T))}1. 
+#program check(t).
+goal :- occurs(t,grab_gold(_)), time(t). 
+:- goal.
 
+#program step(t).
+1 { occurs(t,A) : action(t,A)  }1 :- time(t).
 
-action(T, explore(L,L'))               :- holds(T, in(agent,L)),
+action(t, explore(L,L'))               :- holds(t, in(agent,L)),
                                        holds(T, env(safe,L')),
                                        not holds(T,env(wall,(L,L'))),
                                        not holds(_,in(agent,L')),
@@ -275,82 +285,49 @@ action(T, explore(L,L'))               :- holds(T, in(agent,L)),
                                        adjacent(L,L'), 
                                        time(T).
 
-action(T, move_back(L,L'))             :- holds(T, in(agent,L)),
-                                       holds(T, env(safe,L')),
+action(t, move_back(L,L'))             :- holds(t, in(agent,L)),
+                                       holds(t, env(safe,L')),
                                        holds(_, in(agent,L')),
-                                       %not occurs(T,leave(L,L')),
-                                       not holds(T,env(wall,(L,L'))),
+                                       %not occurs(t,leave(L,L')),
+                                       not holds(t,env(wall,(L,L'))),
                                        adjacent(L,L'),
-                                       time(T).
+                                       time(t).
                                        
 
-action(T, grab_gold(L))             :- holds(T, in(agent,L)),
-                                       holds(T, env(sparkle,L)),
-                                       time(T). 
+action(t, grab_gold(L))             :- holds(t, in(agent,L)),
+                                       holds(t, env(sparkle,L)),
+                                       time(t). 
 
 
 
-action(T, escape(L,L'))               :- holds(T, in(agent,L)),
-                                       holds(T, env(exit,L')), 
-                                       holds(T, env(start,L)), 
-                                       %holds(T, env(carry_gold,_)),
-                                       T > 0. 
+action(t, escape(L,L'))               :- holds(t, in(agent,L)),
+                                       holds(t, env(exit,L')), 
+                                       holds(t, env(start,L)), 
+                                       holds(t, env(carry_gold,_)),
+                                       t > 0. 
 
 
-action(T, kill_wumpus((X,Y'),(X,Y)))          :- holds(T, env(wumpus,(X,Y))),
-                                                 holds(T, in(agent,(X,Y'))),
-                                                 holds(T, env(arrow,N)),
-                                                 not holds(T,env(dead_wumpus,(X,Y))),
+action(t, kill_wumpus((X,Y'),(X,Y)))          :- holds(t, env(wumpus,(X,Y))),
+                                                 holds(t, in(agent,(X,Y'))),
+                                                 holds(t, env(arrow,N)),
+                                                 not holds(t,env(dead_wumpus,(X,Y))),
                                                  | Y'| - |Y| <= 3,
                                                  Y != Y',
                                                  N > 0.
 
-action(T, kill_wumpus((X',Y),(X,Y)))          :- holds(T, env(wumpus,(X,Y))),
-                                                 holds(T, in(agent,(X',Y))),
-                                                 holds(T, env(arrow,N)),
-                                                 time(T),
-                                                 not holds(T,env(dead_wumpus,(X,Y))),
+action(t, kill_wumpus((X',Y),(X,Y)))          :- holds(t, env(wumpus,(X,Y))),
+                                                 holds(t, in(agent,(X',Y))),
+                                                 holds(t, env(arrow,N)),
+                                                 time(t),
+                                                 not holds(t,env(dead_wumpus,(X,Y))),
                                                  |X'| - |X| <= 3, 
                                                  X != X',
                                                  N > 0.   
                                        
 
 
-
-% :- occurs(T,leave((X,Y),(X',Y'))), 
-%    holds(T,env(exit,(EX,EY))), 
-%    ND = |X' - EX| + |Y' - EY|, 
-%    OD = | X-EX| + |Y-EY|, 
-%    ND > OD.
-
-% :- occurs(T, leave(_,_)), 
-%    not holds(T,env(carry_gold,_)). 
-
-%:- occurs(T, explore(L,_)),
-%   holds(T,env(carry_gold,G)).
-   
-%:- occurs(T, move(L,_)), 
-%   holds(T,env(carry_gold,G)).
-
-:- action(T, explore(L,L')), 
-   holds(T-1,in(agent,L')).
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% ACT : Exectute part of the plan: update knowledge base; Back to observe
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Move and Escape
-%%%%%%%%%%%%%%%%%%%%%%%
-% occurs(T,move(agent,L,L' ))         :- goal(T,explore(L,L')).
-% occurs(T,move(agent,L,L'))          :- goal(T,leave(L,L')). 
-% occurs(T,escape(agent,L))           :- goal(T, escape(L)). 
-% occurs(T,move(agent,L,L'))          :- goal(T,backtrack(L,L')).
-
-% % IF SPARKLE
-% %%%%%%%%%%%%%%%%%%%%%%
-% occurs(T, grab_gold(agent,L))       :- goal(T, grab_gold(L)). 
-
-% % IF KILL WUMPUS
-% %%%%%%%%%%%%%%%%%%%%%
-% occurs(T, kill_wumpus(A,W))           :- goal(T,kill_wumpus(A,W)).
+#show occurs/2.
+%#show -holds/2.

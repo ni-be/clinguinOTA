@@ -1,3 +1,5 @@
+
+
 %constant use
 
 ctime(T) :- T = #max{T2 : time(T2)}.
@@ -54,11 +56,11 @@ elem(ota_agent, container,w):- ctime(T),holds(T,env(escaped,_)).
          attr(agent_loc(A),height,30):-agent_map(A).
          attr(agent_loc((X,Y)),grid_column,1):-agent_map((X,Y)).
          attr(agent_loc((X,Y)),grid_row,2):-agent_map((X,Y)).
-         % % attr(agent_loc(A),class,("border-dark";"bg-info")):-agent_map(A).
+         % % % attr(agent_loc(A),class,("border-dark";"bg-info")):-agent_map(A).
    
          
          attr(agent_loc((X,Y)), icon,"fa-user")    :- holds(T,in(agent,(X,Y))), ctime(T), not holds(T, env(escaped,_)).
-         attr(agent_loc((X,Y)), class,("border-dark";"bg-success";"bg-opacity-50"))    :- holds(T,in(agent,(X,Y))), ctime(T), not holds(T, env(escaped,_)).         
+         % attr(agent_loc((X,Y)), class,("border-dark";"bg-success";"bg-opacity-50"))    :- holds(T,in(agent,(X,Y))), ctime(T), not holds(T, env(escaped,_)).         
          attr(agent_loc(A), class, ("bg-opacity-25")) :- ctime(T), not holds(T,in(agent,(A))), agent_map(A).
 
       elem(state_info(A), button, agent(A)):- agent_map(A),ctime(T), not holds(T,env(wall,(_,A))).
@@ -70,40 +72,40 @@ elem(ota_agent, container,w):- ctime(T),holds(T,env(escaped,_)).
          %% EMPTY STATE 
          %%%%%%%%%%%%%%%%%%%%%%%%%%
          attr(state_info(A), class,("fa-solid";"fa-e")) :- holds(T,env(empty,A)), ctime(T).
-         attr(state_info(A),class,("border-dark";"bg-success","bg-opacity-50")):-agent_map(A), holds(T,env(empty,A)), ctime(T).
+         % attr(state_info(A),class,("border-dark";"bg-success","bg-opacity-50")):-agent_map(A), holds(T,env(empty,A)), ctime(T).
          
          %% Smell State
          %%%%%%%%%%%%%%%%%%%%%%%%%
 
          attr(state_info(A), icon, "fa-biohazard") :- holds(T,env(smell,A)), ctime(T).
-         attr(state_info(A), class,("border-dark";"bg-warning";"bg-opacity-50")) :- holds(T,env(smell,A)), ctime(T).
+         % attr(state_info(A), class,("border-dark";"bg-warning";"bg-opacity-50")) :- holds(T,env(smell,A)), ctime(T).
 
          %% Wumpus State
          %%%%%%%%%%%%%%%%%%%%%%%%
          attr(state_info(A), icon, "fa-hippo") :- holds(T,env(assume(wumpus),A)), ctime(T).
-         attr(state_info(A), class,("border-dark";"bg-warning";"bg-opacity-25")) :- holds(T,env(assume(wumpus),A)), ctime(T).
+         % attr(state_info(A), class,("border-dark";"bg-warning";"bg-opacity-25")) :- holds(T,env(assume(wumpus),A)), ctime(T).
 
          attr(state_info(A), icon,"fa-hippo") :- holds(T,env(wumpus,A)), ctime(T).
-         attr(state_info(A), class,("border-dark";"bg-danger";"bg-opacity-50")) :- holds(T,env(wumpus,A)), ctime(T). 
+         % attr(state_info(A), class,("border-dark";"bg-danger";"bg-opacity-50")) :- holds(T,env(wumpus,A)), ctime(T). 
          
          %% Breeze State
          %%%%%%%%%%%%%%%%%%%%%%%%
          attr(state_info(A), icon, "fa-wind") :- holds(T,env(breeze,A)), ctime(T).
-         attr(state_info(A), class,("border-dark";"bg-warning";"bg-opacity-50")) :- holds(T,env(breeze,A)), ctime(T).
+         % attr(state_info(A), class,("border-dark";"bg-warning";"bg-opacity-50")) :- holds(T,env(breeze,A)), ctime(T).
 
          %% Pit State
          %%%%%%%%%%%%%%%%%%%%%%%%
          attr(state_info(A), icon, "fa-circle-down") :- holds(T,env(assume(pit),A)), ctime(T).
-         attr(state_info(A), class,("border-dark";"bg-warning";"bg-opacity-25")) :- holds(T,env(assume(pit),A)), ctime(T).
+         % attr(state_info(A), class,("border-dark";"bg-warning";"bg-opacity-25")) :- holds(T,env(assume(pit),A)), ctime(T).
          
          attr(state_info(A), icon,"fa-circle-down") :- holds(T,env(pit,A)), ctime(T).
-         attr(state_info(A), class,("border-dark";"bg-danger";"bg-opacity-50")) :- holds(T,env(pit,A)), ctime(T). 
+         % attr(state_info(A), class,("border-dark";"bg-danger";"bg-opacity-50")) :- holds(T,env(pit,A)), ctime(T). 
          
  
          %% Gold State
          %%%%%%%%%%%%%%%%%%%%%%%
          attr(state_info(A), icon,"fa-gem")   :- holds(T,env(sparkle,A)), ctime(T).
-         attr(state_info(A), class,("border-dark";"bg-primary";"bg-opacity-25"))   :- holds(T,env(sparkle,A)), ctime(T).         
+         % attr(state_info(A), class,("border-dark";"bg-primary";"bg-opacity-25"))   :- holds(T,env(sparkle,A)), ctime(T).         
          
          %% Unknown State
          %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -211,37 +213,12 @@ elem(ota_agent, container,w):- ctime(T),holds(T,env(escaped,_)).
         
 
 
-
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-   %%%%%%%%% NEXT ACTION DROPDOWN MENU    
-   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-         
-      %elem(dd_holds(A), dropdown_menu, agent(A)):- agent_map(A),ctime(T), not holds(T,env(wall,(_,A))).
-      %    attr(dd_holds(A),width,25):-agent_map(A).
-      %    attr(dd_holds(A),height,25):-agent_map(A).
-      %    attr(dd_holds((X,Y)),grid_column,X):-agent_map((X,Y)).
-      %    attr(dd_holds((X,Y)),grid_row,Y):-agent_map((X,Y)).
-      %    attr(dd_holds(A),class,("border-dark";"bg-info","bg-opacity-25")):-agent_map(A).
-
-      %    %%%%%%%%%%%%%%%
-      %    %% CELLS
-      %    %%%%%%%%%%%%%%%
-      %    elem(dd_items(A,H), dropdown_menu_item, dd_holds(A)) :- agent_map(A), ctime(T), holds(T,env(H,A)).
-      %    attr(dd_items(A,H), label, H):- holds(T,env(H,A)),ctime(T).
-
-      %    elem(dd_items(A,H), dropdown_menu_item, dd_holds(A)) :- agent_map(A), ctime(T), -holds(T,env(H,A)).
-      %    attr(dd_items(A,H), label, H):- -holds(T,env(H,A)), ctime(T).
-      %    attr(dd_items(A,H), class,("text-danger")) :- -holds(T,env(H,A)),ctime(T).  
-      %    when(dd_items(A,H), click,call,(add_assumption(holds(T,env(H,A)),true))) :- -holds(T,env(H,A)), ctime(T).
-      
-      % elem(holds(T,env(E,A)),dropdown_menu_item, holds(T,env(E,A))) :- agent_map(A), holds(T,env(E,A)).
-      % attr(assume(AM), label, E ) :- holds(T,env(E,AM)), ctime(T), agent_map(AM).
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    %%% GAME INFORMATION %%%%
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      elem(ctl_info(T),button, info) :- ctime(T).
+      elem(ctl_info(T),label, info) :- ctime(T).
          attr(ctl_info(T), label, "Game Information"):- ctime(T).
-         attr(ctl_info(T), class, ("border-dark";"border-2")) :- ctime(T).  
+         % attr(ctl_info(T), class, ("border-dark";"border-2")) :- ctime(T).  
       
       
       elem(ctime(T),button, info) :- ctime(T).
@@ -382,11 +359,11 @@ elem(message_wumpus(W), message, info):- holds(T,env(wumpus_yell,W)), holds(T, i
         when(restart(T), click, call, (restart())) :- ctime(T), holds(_,env(escaped,_)).  
  
 
-% %%%%%%%%%%%%%%%%%%%%%%%%
-% % Menu bar
-% %%%%%%%%%%%%%%%%%%%%%%%
-% elem(menu_bar, menu_bar, w).
-% attr(menu_bar, title, "Wumpus Observe Think Act Loop").
+%%%%%%%%%%%%%%%%%%%%%%%%
+% Menu bar
+%%%%%%%%%%%%%%%%%%%%%%%
+elem(menu_bar, menu_bar, w).
+attr(menu_bar, title, "Wumpus Observe Think Act Loop - Single Shot Variant").
 
 % attr(menu_bar, icon, "fa-table-cells").
 %      elem(menu_bar_prev, button, menu_bar):- time(T), time(T-1), T > 0.
