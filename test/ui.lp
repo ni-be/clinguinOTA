@@ -122,11 +122,11 @@ attr(menu_bar, icon, "fa-elevator").
     elem(menu_bar_next, button, menu_bar):- not goal(_).
     attr(menu_bar_next, label, "Solve incrementally"):- not goal(_).
     attr(menu_bar_next, icon, "fa-forward-step"):- not goal(_).
-    when(menu_bar_next, click, call,O):-not goal(_), next_step_operations(O).
-    when(w, load, call, O):- _clinguin_unsat, _clinguin_external(check(T),true), next_step_operations(O).
-    when(w, load, call, (select("#show occ/2."),
-        ground(step,(T+1)),
-        set_external(query(T), false),
-        set_external(query(T+1), true),
-        set_external(check(T),false))
-    ):- time(T), not _clinguin_unsat, _clinguin_external(check(T),true).
+    % when(menu_bar_next, click, call,O):-not goal(_), next_step_operations(O).
+    % when(w, load, call, O):- _clinguin_unsat, _clinguin_external(check(T),true), next_step_operations(O).
+    % when(w, load, call, (select("#show occ/2."),
+    %     ground(step,(T+1)),
+    %     set_external(query(T), false),
+    %     set_external(query(T+1), true),
+    %     set_external(check(T),false))
+    % ):- time(T), not _clinguin_unsat, _clinguin_external(check(T),true).

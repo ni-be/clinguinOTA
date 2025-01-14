@@ -1,6 +1,6 @@
 % Everything related to the environment itself.
 
-current_time(T) :- T = #max{T2 : occurs(T2,_)}.
+current_time(T) :- T = #max{T2 : holds(T2,env(agent,_))}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% WORLD RULES
@@ -87,28 +87,6 @@ envholds(T,env(dead_wumpus_yell, WL)) :- occurs(T,_),-eholds(T,env(wumpus,WL)), 
 
 envholds(T,env(goal_reached,(X-1,Y))) :- occurs(T,leave), holds(T-1,env(agent,(X,Y))).
 
-% holds(T,env(agent, L))          :- occurs(T, explore(OL, L)), 
-%                                     holds(T-1,env(agent,OL)).
-
-% holds(T,env(agent, L))          :- occurs(T, move_back(OL, L)), 
-%                                   time(T).
-                                   
-% holds(T,env(agent,L))           :- occurs(T, grab_gold(L)), 
-%                                   time(T).
-
-% holds(T,envn(agent,A))          :- occurs(T, kill_wumpus(A,L)),
-%                                   time(T).
-
-% holds(T,env(agent,A))          :- occurs(T, leave(OL,A)),
-%                                   time(T).
-
-% holds(T,env(agent,L))          :- occurs(T, escape(L,A)),
-%                                   time(T).
-% holds(T,env(agent,A))          :- occurs(T, backtrack(L,A)),
-%                                   time(T).
-
-% eholds(T,env(agent,L))         :- holds(T,in(agent,L)).
-
 %dummy to avoid warning!
 occurs(-1000, dummy).
 
@@ -119,35 +97,13 @@ occurs(-1000, dummy).
 % Update time for var if no change occurs. 
 eholds(T,env(E,L))             :- eholds(T-1,env(E,L)),
                                   not -eholds(T,env(E,L)), 
-                                  current_time(T).
+                                  occurs(T,_).
 
 -eholds(T,env(E,L))            :- -eholds(T-1,env(E,L)), 
                                   not eholds(T,env(E,L)), 
-                                  current_time(T).
+                                  current_time(T,_).
 
-% -eholds(T, env(gold,G))        :- eholds(T-1, env(gold,G)), 
-%                                   occurs(T,grab_gold),
-%                                   holds(T,env(agent,G)), 
-%                                   time(T).
-                                   
-% -eholds(T, env(sparkle,G))     :- eholds(T, env(gold,G)), 
-%                                   ooccurs(T,grab_gold),
-%                                   holds(T,env(agent,G)), 
-%                                   time(T).
-
-% -eholds(T+1, env(wumpus,W))      :- eholds(T, env(wumpus,W)),
-%                                   occurs(T, kill_wumpus(A,W)),
-%                                   time(T).
-                                  
-% eholds(T+1, env(dead_wumpus,W))  :- -eholds(T,env(wumpus,W)),
-%                                   occurs(T, kill_wumpus(A,W)),
-%                                   time(T).
-
-% -eholds(T+1, env(smell,S))       :- occurs(T, kill_wumpus(A,W)),
-%                                   eholds(T,env(smell,S)),
-%                                   adjacent(W,S),
-%                                   time(T).
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% OUTPUT CONVERSEN / FILTER FOR AGENT %%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -157,28 +113,14 @@ eholds(T,env(E,L))             :- eholds(T-1,env(E,L)),
 envholds(T, env(E,L))          :- eholds(T,env(E,L)),
                                   not -eholds(T,env(E,L)), 
                                   holds(T, env(agent,L)), 
-                                  E  != agent, current_time(T).
+                                  E  != agent, occurs(T,_).
 
 envholds(T, env(E,(L1,L2)))    :- eholds(T,env(E,(L1,L2))), 
                                   holds(T,env(agent,L1)), 
-                                  current_time(T).
-
-% envholds(T, env(exit,L))       :- eholds(T,exit(L)), 
-%                                   current_time(T).
-                                   
-% envholds(T, env(start,L))      :- eholds(T,start(L)), 
-%                                   current_time(T).
-
-% envholds(T, env(wumpus_yell,W)):- occurs(T-1, kill_wumpus(A,W)),
-%                                   current_time(T).
-
-% envholds(T, env(escaped,L)) :- occurs(T, escape(A,L)), current_time(T).
-
-
-% envholds(T,in(agent,L)) :- holds(T, in(agent,L)).
+                                  occurs(T,_).
 
 #show envholds/2.
-%#show current_time/1.
+#show current_time/1.
 %#show time/1.
 %#show holds/2.
 %#show eholds/2.

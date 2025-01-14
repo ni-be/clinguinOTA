@@ -43,20 +43,20 @@ elem(ota_agent, container,w):- ctime(T),holds(T,env(escaped,_)).
 %%%%% GAME BOARD.
 %%%%%%%%%%%%%%%%%%%%%%%%%
 
-      elem(agent((X,Y)),container,ota_agent) :- _all(gui(map((X,Y)))).
-        attr(agent((X,Y)),width,100)            :- _all(gui(map((X,Y)))).
-        attr(agent((X,Y)),height,100)           :- _all(gui(map((X,Y)))).
+      elem(agent((X,Y)),container,ota_agent)   :- _all(gui(map((X,Y)))).
+        attr(agent((X,Y)),width,100)           :- _all(gui(map((X,Y)))).
+        attr(agent((X,Y)),height,100)          :- _all(gui(map((X,Y)))).
         attr(agent((X,Y)),grid_column,X)       :- _all(gui(map((X,Y)))).
         attr(agent((X,Y)),grid_row,Y)          :- _all(gui(map((X,Y)))).
         attr(agent((X,Y)),class,("m-1"))       :- _all(gui(map((X,Y)))).
-        attr(agent(S),child_layout, grid):- _all(gui(map(S))).
+        attr(agent(S),child_layout, grid)      :- _all(gui(map(S))).
                      
       elem(agent_loc(A), button, agent(A)):- agent_map(A),ctime(T), not holds(T,env(wall,(_,A))).         %, holds(T,in(agent,A)).
          attr(agent_loc(A),width,30):-agent_map(A).
          attr(agent_loc(A),height,30):-agent_map(A).
          attr(agent_loc((X,Y)),grid_column,1):-agent_map((X,Y)).
          attr(agent_loc((X,Y)),grid_row,2):-agent_map((X,Y)).
-         % % % attr(agent_loc(A),class,("border-dark";"bg-info")):-agent_map(A).
+         attr(agent_loc(A),class,("border-dark";"bg-info")):-agent_map(A).
    
          
          attr(agent_loc((X,Y)), icon,"fa-user")    :- holds(T,in(agent,(X,Y))), ctime(T), not holds(T, env(escaped,_)).

@@ -18,10 +18,12 @@ holds(0,in(agent,L)) :- init_env(0,in(agent,L)).
 
 holds(0,env(E,L)) :- init_env(0,env(E,L)).
 
+holds(0,treasure(1)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #program step(t).
 #external query(t).
+#external check(t).
 
 #external envholds(t,env(empty,L)) : holds(t,in(agent,L)).
 #external envholds(t,env(wall,(L,L'))) : holds(t,in(agent,L)),adjacent(t,L,L').
@@ -34,7 +36,7 @@ holds(0,env(E,L)) :- init_env(0,env(E,L)).
 adjacent(t,(X,Y),(X+DX,Y+DY)) :- holds(t,in(agent,(X,Y))), 
                                  dir((DX, DY)). 
 
-
+holds(t,treasure(F)) :- holds(t-1,treasure(F)), not holds(t,carry_gold).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -226,3 +228,10 @@ holds(t,in(agent,L)) :- occurs(t,shoot_up), holds(t-1,in(agent,L)).
 
 holds(t,in(agent,EXIT)) :- occurs(t,leave), holds(t-1,in(agent,L)),holds(_,env(exit,EXIT)), adjacent(_,L,EXIT).
 :- occurs(t,leave), not holds(t-1,carry_gold).
+
+
+% goal(t):- #count{F:holds(t, treasure(F))}==0, query(t).
+% :-check(t), query(t), not goal(t).
+
+% goal(t) :- holds(t-1,in(agent,(2,2))), query(t). %, init_env(0,env(exit,(0,1))), holds(t-1,carry_gold).
+% :- not goal(t), query(t).

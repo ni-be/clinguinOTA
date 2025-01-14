@@ -71,7 +71,7 @@ class ota_backend(ClingoBackend):
             # self._add_assumption(atom, "true")
             self._set_external(atom, "true")
             self._loc_data.append(atom)
-            print(atom)
+
             # self._add_assumption(atom, "true")
         print("====================================")
         for atom in env_m.symbols(atoms=True):
@@ -109,7 +109,7 @@ class ota_backend(ClingoBackend):
         all actions that influence the env. are in here.
 
         """
-        # start_time = time.perf_counter()
+        agent_start_time = time.perf_counter()
 
         # self._ground("step", [step])
 
@@ -120,12 +120,69 @@ class ota_backend(ClingoBackend):
         self.set_external(f"query({int(step)})", "false")
 
         self.set_external(f"query({int(step)+1})", "true")
+
+        agent_time = time.perf_counter()
+
+        agent_runtime = agent_time - agent_start_time
+
+        env_start_time = time.perf_counter()
         self._compute_env(f"{int(step)}", action)
+
+        env_time = time.perf_counter()
+        env_runtime = env_time - env_start_time
+
         # self._outdate()
         self.update()
 
-    # def agent_init_request(self, step,action):
-    #     self._compute_env()
+        runtime = time.perf_counter()
+        full_runtime = runtime - agent_start_time
+
+        print(f"Step:{step}, AGENT RUNTIME: {agent_runtime}")
+        print(f"Step:{step}, ENV RUNTIME: {env_runtime}")
+
+        print(f"Step:{step}, Total RUNTIME: {full_runtime}")
+
+    def inc_agent_action(self, step, action):
+        """
+        when action is triggered in UI, append action to the list of actions.
+        all actions that influence the env. are in here.
+
+        """
+        agent_start_time = time.perf_counter()
+
+        # self._ground("step", [step])
+
+        self.select(f"{action}.")
+
+        self._ground("step", [f"{int(step) + 1}"])
+
+        self.set_external(f"query({int(step)})", "false")
+
+        self.set_external(f"query({int(step)+1})", "true")
+
+        self.set_external(f"check({int(step)})", "false")
+
+        self.set_external(f"check({int(step)+1})", "true")
+        agent_time = time.perf_counter()
+
+        agent_runtime = agent_time - agent_start_time
+
+        env_start_time = time.perf_counter()
+        self._compute_env(f"{int(step)}", action)
+
+        env_time = time.perf_counter()
+        env_runtime = env_time - env_start_time
+
+        # self._outdate()
+        self.update()
+
+        runtime = time.perf_counter()
+        full_runtime = runtime - agent_start_time
+
+        print(f"Step:{step}, AGENT RUNTIME: {agent_runtime}")
+        print(f"Step:{step}, ENV RUNTIME: {env_runtime}")
+
+        print(f"Step:{step}, ENV RUNTIME: {full_runtime}")
 
     @cached_property
     def _ds_env(self):
