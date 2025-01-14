@@ -11,7 +11,7 @@ from clinguin.utils.annotations import extends
 from clinguin.server.application.backends import ClingoBackend
 from clinguin.server.data.domain_state import solve, tag
 from clingo import Control
-
+from clingox import program as clingox_program
 
 class ota_backend(ClingoBackend):
     """
@@ -45,7 +45,7 @@ class ota_backend(ClingoBackend):
         self._agent_data = []
         self._actions = []
 
-    """ 
+    """
     2. Get the init environment at time 0 to load based on the provided instance data
     """
 
@@ -114,11 +114,14 @@ class ota_backend(ClingoBackend):
         # self._ground("step", [step])
 
         self.add_assumption(action, "true")
+        ground_program = clingox_program.Program()
+        self._ctl.register_observer(
+            clingox_program.ProgramObserver(ground_program)
+        )
 
         self._ground("step", [f"{int(step) + 1}"])
-
         self.set_external(f"query({int(step)})", "false")
-
+        print(ground_program)
         self.set_external(f"query({int(step)+1})", "true")
 
         agent_time = time.perf_counter()
