@@ -1,12 +1,11 @@
+
 #program base.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 dir((DX, DY))               :- DX = -1..1, 
                                DY = -1..1, 
                                |DX|+|DY| == 1.
 
-adjacent(0,(X,Y),(X+DX,Y+DY)) :- holds(0,in(agent,(X,Y))), 
-                                 dir((DX, DY)). 
-
+adjacent(0,(X,Y),(X+DX,Y+DY)) :- agent_map(0,(X,Y)), dir((DX,DY)).
 holds(0,env(safe,L)) :- adjacent(0,L',L), 
                         holds(0,in(agent,L')), 
                         not holds(0,env(wall,(L',L))).
@@ -18,220 +17,253 @@ holds(0,in(agent,L)) :- init_env(0,in(agent,L)).
 
 holds(0,env(E,L)) :- init_env(0,env(E,L)).
 
-holds(0,treasure(1)).
+holds(0,arrow(1)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #program step(t).
 #external query(t).
-#external check(t).
 
-#external envholds(t,env(empty,L)) : holds(t,in(agent,L)).
-#external envholds(t,env(wall,(L,L'))) : holds(t,in(agent,L)),adjacent(t,L,L').
-#external envholds(t,env(sparkle,L)) : holds(t,in(agent,L)).
-#external envholds(t,env(breeze,L)) : holds(t, in(agent,L)).
-#external envholds(t,env(smell,L)) : holds(t, in(agent,L)).
-#external envholds(t,env(dead_wumpus_yell, L)) : holds(t,env(wumpus,L)),adjacent(_,_,L).
-#external envholds(t,env(goal_reached,EXIT)) : holds(t,env(exit,EXIT)).
+#external envholds(t,env(empty,L)) : holds(t,in(agent,L)), not holds(t-1,env(empty,L)).
+#external envholds(t, env(wall,((X,Y),(X+DX,Y+DY)))) : holds(t,in(agent,(X,Y))), dir((DX,DY)). 
+#external envholds(t,env(sparkle,L)) : holds(t,in(agent,L)), not holds(t-1,env(sparkle,L)).
+#external envholds(t,env(breeze,L)) : holds(t, in(agent,L)), not holds(t-1,env(breeze,L)).
+#external envholds(t,env(smell,L)) : holds(t, in(agent,L)), not holds(t-1,env(smell,L)).
+#external envholds(t,env(dead_wumpus_yell,WL)) : holds(t-1,in(agent,L)), adjacent(_,L,WL).
 
-adjacent(t,(X,Y),(X+DX,Y+DY)) :- holds(t,in(agent,(X,Y))), 
-                                 dir((DX, DY)). 
-
-holds(t,treasure(F)) :- holds(t-1,treasure(F)), not holds(t,carry_gold).
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % REALITY CHECK AXIOMS / Occurence-Awareness Axioms
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-holds(t, F)     :- observed(t, true, F).
--holds(t,F)     :- observed(t, false,F).
+holds(t,F)      :- observed(t, true, F), holds(t,in(agent,_)).
+-holds(t,F)     :- observed(t, false,F), holds(t,in(agent,_)).
 
 :- holds(t,F),  observed(t, false, F).
 :- -holds(t,F), observed(t, true, F).
 
-happened(t,F)  :- observed(t, true, F). 
-happened(t,agent(L,A)) :-  holds(t-1,in(agent,L)), occurs(t-1,A). 
+% happened(t,F)          :- observed(t, true, F). 
+% happened(t,agent(L,(A,E))) :- holds(t-1,in(agent,L)), occurs(t-1,A,E). 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% OBSERVE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-observed(t, true, env(E,L)) :- envholds(t,env(E,L)).
-observed(t, false,env(E,L)) :- envholds(t,env(empty,L)), env(E). 
+observed(t, true, env(E,L))         :- envholds(t,env(E,L)), 
+                                       holds(t,in(agent,L)), 
+                                       not holds(t-1,env(E,L)).
 
+observed(t, true, env(wall,(L,NL))) :- envholds(t,env(wall,(L,NL))), 
+                                       holds(t,in(agent,L)), 
+                                       not holds(t-1,env(wall,(L,NL))).
+
+observed(t, false,env(E,L))         :- envholds(t,env(empty,L)),
+                                       holds(t,in(agent,L)),
+                                       holds(t-1,env(E,L)), 
+                                       env(E). 
+
+observed(t, true, env(dead_wumpus_yell,WL)) :- envholds(t,env(dead_wumpus_yell,WL)), 
+                                               not holds(t-1,env(dead_wumpus_yell,WL)).
+
+% One could remove the holds(t-1,env(E,L)), but that increases the program
+% size significantly. As implemented above something is only observed to be false
+% if it was previously observed.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% THINK: select an approriate Goal, G
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% % Update knowledge base
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Update unchanged knowledge 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-holds(t,env(E,L))                 :- holds(t-1,env(E,L)), 
-                                     not -holds(t,env(E,L)).
+holds(t,env(E,L))                  :- holds(t-1,env(E,L)), 
+                                      not -holds(t,env(E,L)).
 
--holds(t,env(E,L))                :- -holds(t-1,env(E,L)), 
-                                     not holds(t,env(E,L)).
+-holds(t,env(E,L))                 :- -holds(t-1,env(E,L)), 
+                                      not holds(t,env(E,L)).
 
+adjacent(t,(X,Y),(X+DX,Y+DY))      :- occurs(t,move,(_,(X,Y))),
+                                      dir((DX, DY)). 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Reason about Observations
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Reason about SAFETY
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Observed to be safe based on Agent location: 
-holds(t, env(safe,L ))             :- holds(t-1,env(empty,L)), 
-                                               holds(t-1,in(agent,L)), 
-                                               not holds(t,env(exit,L)).
+holds(t, env(safe,L ))             :- holds(t,env(empty,L)), 
+                                      holds(t,in(agent,L)), 
+                                      not holds(t,env(exit,L)).
 
-holds(t,env(safe,L'))              :- holds(t-1,env(empty,L)), 
-                                               holds(t-1, in(agent,L)), 
-                                               not holds(t,env(wall,(L,L'))), 
-                                               adjacent(_,L,L').
+holds(t,env(safe,NL))              :- holds(t,env(empty,L)), 
+                                      holds(t-1, in(agent,L)),    
+                                      not holds(t,env(wall,(L,NL))), 
+                                      adjacent(_,L,NL).
 
-holds(t,env(safe,L ))              :- holds(t-1,env(sparkle,L)), 
-                                               holds(t-1,in(agent,L)).
+holds(t,env(safe,L ))              :- holds(t,env(sparkle,L)), 
+                                      holds(t-1,in(agent,L)).
 
-holds(t,env(safe,L'))              :- holds(t-1,env(sparkle,L)), 
-                                               holds(t-1, in(agent,L)), 
-                                               not holds(t,env(wall,(L,L'))), 
-                                               adjacent(_,L,L').
+holds(t,env(safe,NL))              :- holds(t,env(sparkle,L)), 
+                                      holds(t-1, in(agent,L)), 
+                                      not holds(t,env(wall,(L,NL))), 
+                                      adjacent(_,L,NL).
 
+holds(t,env(safe,SL))              :- holds(t-1,in(agent,B)),
+                                      holds(t,env(breeze,B)),
+                                      holds(t,env(pit,PL)),
+                                      not holds(t,env(wall,(B,SL))),
+                                      adjacent(_,B,PL),
+                                      adjacent(_,B,SL),
+                                      SL != PL.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%% PIT / BREEZE  
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-holds(t, env(assume(pit),L'))      :- holds(t-1,env(breeze,L)),
-                                      holds(t-1,in(agent,L)), 
-                                      not holds(t, env(safe,L')), 
-                                      not holds(t-1, env(pit,L')),
-                                      not holds(t-1, env(wall,(L,L'))),
-                                      adjacent(_,L,L').
+holds(t,env(safe,SL))              :- holds(t-1,in(agent,B)),
+                                      holds(t,env(smell,B)),
+                                      holds(t,env(wumpus,WL)),
+                                      not holds(t,env(wall,(B,SL))),
+                                      adjacent(_,B,WL),
+                                      adjacent(_,B,SL),
+                                      SL != WL.
 
+holds(t,env(safe,SL))              :- holds(t-1,env(assume(E),SL)),
+                                      -holds(t,env(assume(E),SL)),
+                                      not holds(t,env(E,SL)).
 
-holds(t, env(pit,L))               :- holds(t-1,env(breeze, B)), 
-                                      holds(t-1,in(agent,B)),
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Reason about PIT / BREEZE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+holds(t, env(pit,PL))              :- holds(t,env(breeze, B)), 
+                                      holds(t,in(agent,B)),
                                       holds(t-1,env(breeze,B')),
-                                      holds(t-1,env(assume(pit),L)),
-                                      not holds(t-1,env(safe,L)), 
-                                      adjacent(_,B,L), 
-                                      adjacent(_,B',L), 
+                                      not holds(t-1,env(safe,PL)),
+                                      not holds(t-1,env(empty,PL)),
+                                      adjacent(_,EL,PL), 
+                                      adjacent(_,B,PL), 
+                                      adjacent(_,B',PL), 
                                       B != B'.
 
-
-holds(t,env(safe,L))               :- holds(t,env(breeze, B)),
-                                      holds(t,env(pit,WL)), 
-                                      % holds(t-1,in(agent,B)),
-                                      not holds(t, env(wall,(B,L))),
-                                      %holds(t, env(assume(pit),L)),
-                                      adjacent(_,B,L), 
-                                      adjacent(_,B,WL), 
-                                      WL != L.
-
--holds(t,env(assume(pit),L))       :- holds(t-1,env(breeze, B)),
-                                      %holds(t-1,in(agent,B)), 
-                                      holds(t-1,env(pit,WL)),  
-                                      holds(t-1, env(assume(pit),L)),
-                                      adjacent(_,B,L), 
-                                      adjacent(_,B,WL), 
-                                      WL != L.
-
-holds(t,env(safe,L)) :- -holds(t,env(assume(pit),L)), not holds(t-1,env(pit,L)).
--holds(t,env(assume(pit),L)) :- holds(t,env(safe,L)), holds(t-1,env(assume(pit),L)). 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%% WUMPUS / SMELL  
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-holds(t, env(assume(wumpus),L'))      :- holds(t-1,env(smell,L)),
+holds(t, env(assume(pit),PL))      :- holds(t,env(breeze,L)),
                                       holds(t-1,in(agent,L)), 
-                                      not holds(t-1, env(safe,L')), 
-                                      not holds(t-1, env(wumpus,L')),
-                                      not holds(t-1, env(wall,(L,L'))),
-                                      adjacent(_,L,L').
+                                      not holds(t, env(safe,PL)), 
+                                      not holds(t, env(wall,(L,PL))),
+                                      not holds(t, env(pit,PL)),
+                                      adjacent(_,L,PL).
 
 
-holds(t, env(wumpus,L))               :- holds(t-1,env(smell, B)), 
-                                      holds(t-1,in(agent,B)),
+-holds(t,env(assume(pit),L))       :- holds(t-1,in(agent,E)),
+                                      holds(t-1,env(assume(pit),L)),
+                                      holds(t,env(safe,L)),
+                                      adjacent(_,E,L).
+
+-holds(t,env(assume(pit),L))      :-  holds(t-1,env(assume(pit),L)),
+                                      holds(t,env(pit,PL)),
+                                      holds(t-1,env(breeze,B)),
+                                      adjacent(_,B,PL),
+                                      adjacent(_,B,L).
+
+-holds(t,env(assume(pit),L))       :- holds(t-1,env(assume(pit),L)), 
+                                      holds(t,env(pit,L)).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% REASON about WUMPUS / SMELL
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+holds(t, env(wumpus,WL))           :- holds(t,env(smell, B)), 
+                                      holds(t,in(agent,B)),
                                       holds(t-1,env(smell,B')),
-                                      holds(t-1,env(assume(wumpus),L)),
-                                      not holds(t-1,env(safe,L)), 
-                                      adjacent(_,B,L), 
-                                      adjacent(_,B',L), 
+                                      not holds(t-1,env(safe,WL)),
+                                      not holds(t-1,env(empty,WL)),
+                                      adjacent(_,EL,WL), 
+                                      adjacent(_,B,WL), 
+                                      adjacent(_,B',WL), 
                                       B != B'.
 
+holds(t, env(assume(wumpus),WL))   :- holds(t,env(smell,L)),
+                                      holds(t-1,in(agent,L)), 
+                                      not holds(t, env(safe,WL)), 
+                                      not holds(t, env(wall,(L,WL))),
+                                      not holds(t, env(wumpus ,WL)),
+                                      adjacent(_,L,WL).
 
-holds(t,env(safe,L))               :- holds(t,env(smell, B)),
-                                      holds(t,env(wumpus,WL)), 
-                                      % holds(t-1,in(agent,B)),
-                                      not holds(t, env(wall,(B,L))),
-                                      %holds(t, env(assume(wumpus),L)),
-                                      adjacent(_,B,L), 
-                                      adjacent(_,B,WL), 
-                                      WL != L.
+-holds(t,env(assume(wumpus),L))    :- holds(t-1,in(agent,E)),
+                                      holds(t-1,env(assume(wumpus),L)),
+                                      holds(t,env(safe,L)),
+                                      adjacent(_,E,L).
 
--holds(t,env(assume(wumpus),L))       :- holds(t-1,env(smell, B)),
-                                      %holds(t-1,in(agent,B)), 
-                                      holds(t-1,env(wumpus,WL)),  
-                                      holds(t-1, env(assume(wumpus),L)),
-                                      adjacent(_,B,L), 
-                                      adjacent(_,B,WL), 
-                                      WL != L.
+-holds(t,env(assume(wumpus),L))    :- holds(t-1,env(assume(wumpus),L)),
+                                      holds(t,env(wumpus,WL)),
+                                      holds(t-1,env(smell,S)),
+                                      adjacent(_,S,WL),
+                                      adjacent(_,S,L).
 
-holds(t,env(safe,L)) :- -holds(t,env(assume(wumpus),L)), not holds(t-1,env(wumpus,L)).
+-holds(t,env(assume(wumpus),L))    :- holds(t-1,env(assume(wumpus),L)), 
+                                      holds(t,env(wumpus,L)).
 
--holds(t,env(assume(wumpus),L)) :- holds(t,env(safe,L)), holds(t-1,env(assume(wumpus),L)). 
+-holds(t,env(wumpus,WL))           :- holds(t-1,env(dead_wumpus_yell,WL)),
+                                      holds(t-1,env(wumpus,WL)).
 
--holds(t,env(wumpus,L))             :- holds(t-1,env(dead_wumpus_yell,L)), 
-                                       holds(t-1,env(wumpus,L)).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% ACT
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-1{occurs(t,A): action(A)}1.  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-action(up;down;left;right;grab_gold;shoot_left;shoot_right;shoot_up;shoot_down;leave).
+1{occurs(t,A,(L,NL)) : action(t,A,(L,NL))}1 :- holds(t-1,in(agent,L)).
 
-%% Movement
-holds(t,in(agent,(X+1,Y))) :- occurs(t,right), holds(t-1,in(agent,(X,Y))),adjacent(_,(X,Y),(X+1,Y)).
-holds(t,in(agent,(X-1,Y))) :- occurs(t,left), holds(t-1,in(agent,(X,Y))),adjacent(_,(X,Y),(X-1,Y)).
-holds(t,in(agent,(X,Y-1))) :- occurs(t,up), holds(t-1,in(agent,(X,Y))),adjacent(_,(X,Y),(X,Y-1)).
-holds(t,in(agent,(X,Y+1))) :- occurs(t,down), holds(t-1,in(agent,(X,Y))),adjacent(_,(X,Y),(X,Y+1)).
+%%%%%%%%%%%%%%%%%%%%
+%%%% MOVE 
+%%%%%%%%%%%%%%%%%%%%
 
-:- occurs(t,right), holds(t-1,in(agent,(X,Y))), not holds(t,env(safe,(X+1,Y))).%,(X+1,Y))).
-:- occurs(t,left), holds(t-1,in(agent,(X,Y))), not holds(t,env(safe,(X-1,Y))).
-:- occurs(t,down), holds(t-1,in(agent,(X,Y))), not holds(t,env(safe,(X,Y+1))).
-:- occurs(t,up), holds(t-1,in(agent,(X,Y))), not holds(t,env(safe,(X,Y-1))).
+action(t,move,(L,NL))            :- holds(t-1,in(agent,L)), 
+                                    adjacent(_,L,NL),
+                                    holds(t,env(safe,NL)).
+  
+holds(t,in(agent,NL))            :- holds(t-1,in(agent,L)),
+                                    occurs(t,move,(L,NL)).
+
+:- occurs(t,move,(L,NL)),
+   holds(t-1,env(wall,(L,NL))).
+
+:- occurs(t,move,(L,NL)),
+   holds(t-1,env(exit,NL)).
+
+%%%%%%%%%%%%%%%%%%%%
+%%%% SHOOT 
+%%%%%%%%%%%%%%%%%%%%
+
+action(t,shoot,(L,WL))           :- holds(t-1,in(agent,L)),
+                                    holds(t,env(wumpus,WL)),
+                                    adjacent(_,L,WL).
+
+holds(t,in(agent,NL))            :- holds(t-1,in(agent,NL)),
+                                    occurs(t,shoot,(NL,_)).
+
+holds(t, arrow(X-1))             :- occurs(t,shoot,(_,_)),
+                                    holds(0,arrow(X)).
+                                    
+:- action(t,shoot,_), holds(t-1,arrow(0)).
+                                       
+%%%%%%%%%%%%%%%%%%%%
+%%%% GRAB Gold 
+%%%%%%%%%%%%%%%%%%%%
+
+action(t,grab_gold,(L,L))        :- holds(t-1, in(agent,L)),
+                                    holds(t-1, env(sparkle,L)).
+
+holds(t,in(agent,L))             :- holds(t-1,in(agent,L)), 
+                                    occurs(t,grab_gold,(L,G)).
+
+holds(t, env(carry_gold,G))     :- holds(t-1,in(agent,G)), 
+                                   occurs(t,grab_gold,(G,G)).
+
+:- occurs(t,grab_gold,(G,G)), 
+   holds(t-1,env(carry_gold,G)).
 
 
-% :- holds(t,env(wall,(L,L'))), holds(t,in(agent,L')), holds(t-1, in(agent,L)), adjacent(_,L,L').
+%%%%%%%%%%%%%%%%%%%%
+%%%% EXIT 
+%%%%%%%%%%%%%%%%%%%%
 
-%% Interaction with Environment - Gold
-holds(t,in(agent,L)) :- occurs(t,grab_gold), holds(t-1,in(agent,L)), holds(t-1,env(sparkle,L)).
-holds(t, carry_gold) :- occurs(t,grab_gold), holds(t-1,in(agent,L)), holds(t-1,env(sparkle,L)).
-holds(t, carry_gold) :- holds(t-1, carry_gold).
-
-:- occurs(t,grab_gold), not holds(t-1,env(sparkle,L)), holds(t-1,in(agent,L)).
-
-%% Interaction with Environment - Wumpus
-holds(t,in(agent,L)) :- occurs(t,shoot_right), holds(t-1,in(agent,L)).
-holds(t,in(agent,L)) :- occurs(t,shoot_left), holds(t-1,in(agent,L)).
-holds(t,in(agent,L)) :- occurs(t,shoot_down), holds(t-1,in(agent,L)).
-holds(t,in(agent,L)) :- occurs(t,shoot_up), holds(t-1,in(agent,L)).
-
-:- occurs(t,shoot_left), not holds(t,env(wumpus,(X-1,Y))), holds(t-1,in(agent,(X,Y))).%, |X'| - |X| >= 2. %, X != X'. %,  N > 0.
-:- occurs(t,shoot_right), not holds(t,env(wumpus,(X+1,Y))), holds(t-1,in(agent,(X,Y))).
-:- occurs(t,shoot_up), not holds(t,env(wumpus,(X,Y-1))), holds(t-1,in(agent,(X,Y))).
-:- occurs(t,shoot_down), not holds(t,env(wumpus,(X,Y+1))), holds(t-1,in(agent,(X,Y))).
-
-%%%% EXIT
-
-holds(t,in(agent,EXIT)) :- occurs(t,leave), holds(t-1,in(agent,L)),holds(_,env(exit,EXIT)), adjacent(_,L,EXIT).
-:- occurs(t,leave), not holds(t-1,carry_gold).
-
-
-% goal(t):- #count{F:holds(t, treasure(F))}==0, query(t).
-% :-check(t), query(t), not goal(t).
-
-% goal(t) :- holds(t-1,in(agent,(2,2))), query(t). %, init_env(0,env(exit,(0,1))), holds(t-1,carry_gold).
-% :- not goal(t), query(t).
+action(t,leave,(L,NL))           :- holds(t-1, in(agent,L)),
+                                    holds(t-1, env(exit,NL)),
+                                    holds(t-1, env(carry_gold,_)).

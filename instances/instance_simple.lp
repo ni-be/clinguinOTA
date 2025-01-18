@@ -63,8 +63,8 @@ map((5,5)).
 map((5,6)).
 eholds(0,start((1,1))).
 eholds(0,env(gold,(4,5))).
-eholds(0,env(pit,(4,2))).
 eholds(0,env(wumpus,(2,4))).
+eholds(0,env(pit,(4,1))).
 wall((1,2),(0,2)).
 wall((1,3),(0,3)).
 wall((1,4),(0,4)).
