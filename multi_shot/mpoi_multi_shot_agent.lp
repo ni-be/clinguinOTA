@@ -23,12 +23,12 @@ holds(0,arrow(1)).
 #program step(t).
 #external query(t).
 
-#external envholds(t,env(empty,L)) : holds(t,in(agent,L)), not holds(t-1,env(empty,L)).
-#external envholds(t, env(wall,((X,Y),(X+DX,Y+DY)))) : holds(t,in(agent,(X,Y))), dir((DX,DY)). 
-#external envholds(t,env(sparkle,L)) : holds(t,in(agent,L)), not holds(t-1,env(sparkle,L)).
-#external envholds(t,env(breeze,L)) : holds(t, in(agent,L)), not holds(t-1,env(breeze,L)).
-#external envholds(t,env(smell,L)) : holds(t, in(agent,L)), not holds(t-1,env(smell,L)).
-#external envholds(t,env(dead_wumpus_yell,WL)) : holds(t-1,in(agent,L)), adjacent(_,L,WL).
+#external room_contents(t,env(empty,L)) : holds(t,in(agent,L)), not holds(t-1,env(empty,L)).
+#external room_contents(t, env(wall,((X,Y),(X+DX,Y+DY)))) : holds(t,in(agent,(X,Y))), dir((DX,DY)). 
+#external room_contents(t,env(sparkle,L)) : holds(t,in(agent,L)), not holds(t-1,env(sparkle,L)).
+#external room_contents(t,env(breeze,L)) : holds(t, in(agent,L)), not holds(t-1,env(breeze,L)).
+#external room_contents(t,env(smell,L)) : holds(t, in(agent,L)), not holds(t-1,env(smell,L)).
+#external room_contents(t,env(dead_wumpus_yell,WL)) : holds(t-1,in(agent,L)), adjacent(_,L,WL).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -48,20 +48,20 @@ holds(t,F)      :- observed(t, true, F), holds(t,in(agent,_)).
 %% OBSERVE
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-observed(t, true, env(E,L))         :- envholds(t,env(E,L)), 
+observed(t, true, env(E,L))         :- room_contents(t,env(E,L)), 
                                        holds(t,in(agent,L)), 
                                        not holds(t-1,env(E,L)).
 
-observed(t, true, env(wall,(L,NL))) :- envholds(t,env(wall,(L,NL))), 
+observed(t, true, env(wall,(L,NL))) :- room_contents(t,env(wall,(L,NL))), 
                                        holds(t,in(agent,L)), 
                                        not holds(t-1,env(wall,(L,NL))).
 
-observed(t, false,env(E,L))         :- envholds(t,env(empty,L)),
+observed(t, false,env(E,L))         :- room_contents(t,env(empty,L)),
                                        holds(t,in(agent,L)),
                                        holds(t-1,env(E,L)), 
                                        env(E). 
 
-observed(t, true, env(dead_wumpus_yell,WL)) :- envholds(t,env(dead_wumpus_yell,WL)), 
+observed(t, true, env(dead_wumpus_yell,WL)) :- room_contents(t,env(dead_wumpus_yell,WL)), 
                                                not holds(t-1,env(dead_wumpus_yell,WL)).
 
 % One could remove the holds(t-1,env(E,L)), but that increases the program
@@ -267,3 +267,5 @@ holds(t, env(carry_gold,G))     :- holds(t-1,in(agent,G)),
 action(t,leave,(L,NL))           :- holds(t-1, in(agent,L)),
                                     holds(t-1, env(exit,NL)),
                                     holds(t-1, env(carry_gold,_)).
+
+
