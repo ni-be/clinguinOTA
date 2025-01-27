@@ -1,15 +1,13 @@
 # Implementing the Observe Think Act loop using Clinguin. 
 
-In this repository you find the first iteration of the Observe Think Act Loop implented using Clinguin
-
 
 ## Installation Instructions
 
 Clingo
-
+[Dowload Clingo on Potassco.org](https://potassco.org/clingo/)
 Clinguin
+[Clinguin install instruction can be found here](https://clinguin.readthedocs.io/en/v2.2.2/clinguin/installation.html)
 
-Clingraph
 
 ## Repository Structure
 
@@ -21,46 +19,38 @@ Clingraph
   - single_shot_ui.lp
 
 - Multi_shot
-  - Agent Encoding for:
-    - m (Mapping)
-    - mp (Mapping + PickUp)
-    - mo (Mapping + Obstacle Avoidance)
-    - mpoi (Mapping + PickUp + Obstacle Avoidance and Interaction)
-    - agent_init_loc.lp **Domain file describing the agent initial location
+  - agent_multi_shot.lp (Agent encoding)
+  - agent_init_loc.lp **Domain file describing the agent initial location
 
 - Single_shot
-  - Agent Encoding for:
-    - m (Mapping)
-    - mp (Mapping + PickUp)
-    - mo (Mapping + Obstacle Avoidance)
-    - mpoi (Mapping + PickUp + Obstacle Avoidance and Interaction)
-
+  - agent_single_shot.lp 
+   
 - Environment
-  - TODO
+  - environment_single_shot.lp
+  - environent_multi_shot.lp
 
-- Benchmarks
 
 - Instance Files
-  - Files for:
-    - m (Mapping)
-    - mp (Mapping + PickUp)
-    - mo (Mapping + Obstacle Avoidance)
-    - mpoi (Mapping + PickUp + Obstacle Avoidance and Interaction)
+    - instance_4x5_.lp  empty map
+    - instance_4x5_g.lp   gold
+    - instance_4x5_pg.lp  pit and gold
+    - instance_4x5_wpg.lp wumpus pit and gold
 
 ## How to Run 
+After installing both Clinguin, and Clingo you need to open a terminal and cd into the root directory of the repository.
+from the CLI you then run the following command for single_shot and multi_shot
+
+the --instance argument can be changed to any of the other instances avaible.
 
 ### Single shot
-
+```console
+foo@bar:~$ clinguin client-server --domain-file single_shot/agent_single_shot.lp --ui-files=ui_files/single_shot_ui.lp  --custom-classes backend/single_shot_OTA_backend.py --backend ota_backend --env-file environment/environment_single_shot.lp --instance instances/instance_4x5_wpg.lp
+```
 ### Multi Shot
-'''Shell
-clinguin client-server --domain-file multi_shot/{**DOMAIN**_multi_shot_agent.lp, agent_init_loc.lp } --ui-files=ui_files/multi_shot_ui.lp --custom-classes backend/multi_shot_OTA_backend.py --backend multi_shot_backend --env-file multi_shot/environment_multi.lp --instance instances/**INSERT INSTANCE**.lp
-'''
 
-So that would be or example:
+```console
+foo@bar:~$ ❯ clinguin client-server --domain-file multi_shot/{agent_multi_shot.lp, agent_init_loc.lp } --ui-files=ui_files/multi_shot_ui.lp --custom-classes backend/multi_shot_OTA_backend.py --backend multi_shot_ota_backend --env-file environment/environment_multi_shot.lp --instance instances/instance_4x5_wpg.lp
 
-TODO 
-'''Shell
-clinguin client-server --domain-file multi_shot/{agent_multi.lp, agent_init_loc.lp } --ui-files=ui_files/multi_shot_ui.lp --custom-classes backend/multi_shot_OTA_backend.py --backend ota_backend --env-file multi_shot/environment_multi.lp --instance instances/instance_simple.lp
-'''
+```
 
 ## License

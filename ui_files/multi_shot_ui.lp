@@ -83,18 +83,18 @@ elem(room(R,S), container, map(R))      :- _clinguin_env(map(R)), room_section((
      attr(room_section(R,S), class,("m-1"))            :- holds(T-1,env(E,R)), E != wall, time(T), room_section((S,_)).
      attr(room_section(R,S), width,50)                 :- _clinguin_env(map(R)), time(T), room_section((S,_)).  
      attr(room_section(R,S), height,50)                :- _clinguin_env(map(R)), time(T), room_section((S,_)).  
-     attr(room_section(R,S),class,("disabled"))        :- holds(T-1,env(E,R)), E != wall, time(T), room_section((S,_)), S != action. 
+     attr(room_section(R,S),class,("disabled";"border-0";"fs-4"))        :- holds(T-1,env(E,R)), E != wall, time(T), room_section((S,_)), S != action. 
 
 elem(room_section(R,agent), button, room(R,agent))     :- holds(T-1,in(agent,R)), time(T).   
      attr(room_section(R,agent), icon,"fa-user")       :- holds(T-1,in(agent,R)), time(T).           
-     attr(room_section(R,agent),class,("bg-opacity-50";"bg-success")) :- holds(T-1,in(agent,R)), time(T).        
+     attr(room_section(R,agent),class,("border-0";"fs-4")) :- holds(T-1,in(agent,R)), time(T).        
 
    
 elem(room_section(R,env), button, room(R,env))  :- not holds(T,env(empty,R)),holds(T,env(E,R)), E != wall, time(T), E!= safe.
-     attr(room_section(R,env),class,("bg-warning";"bg-opacity-25"))   :- holds(T,env(assume(_),R)), time(T). 
-     attr(room_section(R,env),class,("bg-success";"bg-opacity-50"))   :- holds(T,env(sparkle,R)), time(T).
-     attr(room_section(R,env), class,("bg-warning";"bg-opacity-50"))  :- holds(T,env(E,R)),E != empty, E!= sparkle, env(E), time(T).
-     attr(room_section(R,env), class,("bg-danger";"bg-opacity-100"))  :- holds(T,env(D,R)), danger(wumpus;pit), danger(D), time(T).  
+     attr(room_section(R,env),class,("text-warning";"fs-4"))   :- holds(T,env(assume(_),R)), time(T). 
+     attr(room_section(R,env),class,("text-white";"fs-6"))   :- holds(T,env(sparkle,R)), time(T).
+     attr(room_section(R,env), class,("text-danger";"fs-4"))  :- holds(T,env(E,R)),E != empty, E!= sparkle, env(E), time(T).
+     attr(room_section(R,env), class,("text-danger";"fs-4"))  :- holds(T,env(D,R)), danger(wumpus;pit), danger(D), time(T).  
 
      attr(room_section(R,env), icon,"fa-gem")          :- holds(T,env(sparkle,R)), time(T).     
      attr(room_section(R,env), icon,"fa-wind")         :- holds(T,env(breeze,R)), time(T).
@@ -111,7 +111,7 @@ elem(room_section(R,env), button, room(R,env))  :- not holds(T,env(empty,R)),hol
      attr(room_section(R,env),class,("bg-success";"bg-opacity-50")) :- holds(T,env(exit,R)), time(T), holds(T-1,env(carry_gold,_)). 
         
 elem(room_section(R,action), button, room(R,action))  :- holds(T-1,in(agent,L)), _any(occurs(T,A,(L,R))), time(T).
-      attr(room_section(R,action),class,("bg-primary";"bg-opacity-50")) :- holds(T-1,in(agent,L)), _any(occurs(T,_,(L,R))), time(T).
+      attr(room_section(R,action),class,("btn-primary";"btn-sm")) :- holds(T-1,in(agent,L)), _any(occurs(T,_,(L,R))), time(T).
       attr(room_section((X+1,Y),action),icon,"fa-arrow-right")          :- holds(T-1,in(agent,(X,Y))), time(T), _any(occurs(T,move,((X,Y),(X+1,Y)))).  
       attr(room_section((X-1,Y),action),icon,"fa-arrow-left")           :- holds(T-1,in(agent,(X,Y))), time(T), _any(occurs(T,move,((X,Y),(X-1,Y)))).  
       attr(room_section((X,Y+1),action),icon,"fa-arrow-down")           :- holds(T-1,in(agent,(X,Y))), time(T), _any(occurs(T,move,((X,Y),(X,Y+1)))).  
@@ -126,7 +126,7 @@ elem(room_section(R,action), button, room(R,action))  :- holds(T-1,in(agent,L)),
  % WHEN CLICK BUTTON
  %----------------
  when(room_section(R,action), click, call, (
-                        agent_action_multi(T, occurs(T,A,(L,R) ) ) ) ) :- holds(T-1,in(agent,L)), action(T,A,(L,R)), _any(occurs(T,A,(L,R))), time(T).
+                        user_choice_inc(T, occurs(T,A,(L,R) ) ) ) ) :- holds(T-1,in(agent,L)), action(T,A,(L,R)), _any(occurs(T,A,(L,R))), time(T).
      
   
    
@@ -261,5 +261,5 @@ elem(live_info, container, legend).
 % Menu bar
 %%%%%%%%%%%%%%%%%%%%%%%
 elem(menu_bar, menu_bar, w).
-attr(menu_bar, title, "Implementing the Observe Think Act Loop - Multishot Variant").
+attr(menu_bar, title, "Wumpus - Multishot Variant").
 

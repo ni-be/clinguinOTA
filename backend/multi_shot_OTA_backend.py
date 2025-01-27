@@ -1,8 +1,7 @@
 """
-Custom Clinguin Backend for the Single Shot OTA implementation
+Custom Clinguin Backend for the Multi Shot ClinguinOTA implementation
 
 """
-
 import time
 from functools import cached_property
 from clinguin.utils.annotations import extends
@@ -11,12 +10,32 @@ from clingo import Control
 
 
 class multi_shot_ota_backend(ClingoBackend):
-    """
-    First init command line, include arrays to store temp data in for computation
-    """
+    """Backend for multi-shot over-the-air (OTA) updates.
 
+    This backend extends the ClingoBackend to support multi-shot OTA updates,
+    allowing for the specification of environment and instance files.
+
+    Attributes:
+        _env_info (list): List of environment file paths.
+        _instance_info (list): List of instance file paths.
+        _current_time (int): Current time step.
+        _loc_data (list): List of location atoms.
+        _env_data (list): List of environment atoms.
+        _agent_data (list): List of agent atoms.  (Currently unused, consider removing)
+        _actions (list): List of actions. (Currently unused, consider removing)
+
+    Args:
+        See base class ClingoBackend.
+
+    Raises:
+        See base class ClingoBackend.
+    """
     @classmethod
     def register_options(cls, parser):
+        """Registers command-line options specific to the Multi-shot OTA backend.
+        Args:
+            parser: An argument parser object (e.g., from argparse).
+        """
         ClingoBackend.register_options(parser)
 
         parser.add_argument(
@@ -30,8 +49,10 @@ class multi_shot_ota_backend(ClingoBackend):
             nargs="*",
         )
 
+
     @extends(ClingoBackend)
     def _init_command_line(self):
+        """Initializes command-line arguments and internal data structures."""
         super()._init_command_line()
         print("init commandline")
         self._env_info = self._args.env_file
@@ -42,32 +63,38 @@ class multi_shot_ota_backend(ClingoBackend):
         self._agent_data = []
         self._actions = []
 
-    """ 
-    2. Get the init environment at time 0 to load based on the provided instance data
-    """
 
     @extends(ClingoBackend)
     def _init_ds_constructors(self):
+        """Initializes domain state constructors, adding a constructor for the environment."""
         super()._init_ds_constructors()
         self._add_domain_state_constructor("_ds_env")
 
-    def env_model(self, env_m):
-        """
-        1. Solve the control object of the environment
-        2. The Atoms defined in the env. encoding with a #show are now added to the clinguin control object.
-        3. The env atoms will be that are true will stored in the env_data array.
-        """
 
+    def env_model(self, env_m):
+        """Processes the environment model from clingo.
+        Args:
+            env_m: The clingo model object representing the environment.
+        Outputs: adds the atoms to the Clinguin control object.
+        """
+        
         for atom in env_m.symbols(shown=True):
             if atom not in self._loc_data:
                 self._set_external(atom, "true")
                 self._loc_data.append(atom)
+
         for atom in env_m.symbols(atoms=True):
             if atom not in self._env_data:
                 self._env_data.append(atom)
 
     def _compute_env(self, step, action):
-        """ """
+        """Computes the environment state given a step and action.
+
+        Args:
+            step (int or str): The current time step.
+            action (str): The action taken.
+        """
+        
         ctl_env = Control()
         ctl_env.load(self._env_info[0])
         ctl_env.load(self._instance_info[0])
@@ -80,39 +107,29 @@ class multi_shot_ota_backend(ClingoBackend):
         ctl_env.ground([("base", [])])
         ctl_env.solve(on_model=self.env_model)
 
-    def agent_action_multi(self, step, action):
-        """ """
-        event_start_time = time.perf_counter()
+    def user_choice_inc(self, step, action):
+        """Increments the time step and updates the environment based on user action.
+
+        Args:
+            step (int or str): The current time step.
+            action (str): The action taken by the user.
+        """
+        
         self._set_constant("x", f"{step}")
         self.add_assumption(action, "true")
-
         self._ground("step", [f"{int(step) + 1}"])
         self.set_external(f"query({int(step)})", "false")
-
         self.set_external(f"query({int(step)+1})", "true")
-
-        agent_time = time.perf_counter()
-        agent_runtime = agent_time - event_start_time
-        env_start_time = time.perf_counter()
-
         self._compute_env(f"{int(step)}", action)
-
-        env_time = time.perf_counter()
-        env_runtime = env_time - env_start_time
-
         self.update()
-        runtime = time.perf_counter()
-        full_runtime = runtime - event_start_time
-
-        print(f"Step:{step}, AGENT RUNTIME: {agent_runtime}")
-        print(f"Step:{step}, ENV RUNTIME: {env_runtime}")
-
-        print(f"Step:{step}, Total RUNTIME: {full_runtime}")
 
     @cached_property
     def _ds_env(self):
+        """Constructs the environment domain state.
+        Returns:
+            str: The ASP program representing the environment domain state.
+        """
         prg = "#defined _clinguin_env/1. "
-
         with open(self._instance_info[0], "r") as file:
             for line in file:
                 line = line.strip().rstrip(".")

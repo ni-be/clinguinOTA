@@ -56,10 +56,10 @@ elem(ota_agent, container,w):- ctime(T),holds(T,env(escaped,_)).
          attr(agent_loc(A),height,30):-agent_map(A).
          attr(agent_loc((X,Y)),grid_column,1):-agent_map((X,Y)).
          attr(agent_loc((X,Y)),grid_row,2):-agent_map((X,Y)).
-         attr(agent_loc(A),class,("border-dark";"bg-info")):-agent_map(A).
+         attr(agent_loc(A),class,("border-0";"disabled")):-agent_map(A).
    
          
-         attr(agent_loc((X,Y)), icon,"fa-user")    :- holds(T,in(agent,(X,Y))), ctime(T), not holds(T, env(escaped,_)).
+         attr(agent_loc((X,Y)), icon,"fa-user")    :- holds(T,in(agent,(X,Y))), ctime(T).
          % attr(agent_loc((X,Y)), class,("border-dark";"bg-success";"bg-opacity-50"))    :- holds(T,in(agent,(X,Y))), ctime(T), not holds(T, env(escaped,_)).         
          attr(agent_loc(A), class, ("bg-opacity-25")) :- ctime(T), not holds(T,in(agent,(A))), agent_map(A).
 
@@ -68,7 +68,7 @@ elem(ota_agent, container,w):- ctime(T),holds(T,env(escaped,_)).
          attr(state_info(A),height,30):-agent_map(A), holds(T,env(_,A)), ctime(T).
          attr(state_info((X,Y)),grid_column,2):-agent_map((X,Y)), holds(T,env(_,(X,Y))), ctime(T).
          attr(state_info((X,Y)),grid_row,2):-agent_map((X,Y)), holds(T,env(_,(X,Y))), ctime(T).
-
+         
          %% EMPTY STATE 
          %%%%%%%%%%%%%%%%%%%%%%%%%%
          attr(state_info(A), class,("fa-solid";"fa-e")) :- holds(T,env(empty,A)), ctime(T).
@@ -135,7 +135,7 @@ elem(ota_agent, container,w):- ctime(T),holds(T,env(escaped,_)).
          attr(action_button(T,A),height,35):-_any(action(T,A)), ctime(T).
          attr(action_button(T,(X,Y)),grid_column,1):-_any(action(T,(X,Y))), ctime(T).
          attr(action_button(T,(X,Y)),grid_row,1):-_any(action(T,(X,Y))), ctime(T).
-         attr(action_button(T,A),class,("border-dark";"bg-primary";"bg-opacity-50")):-_any(action(T,A)), ctime(T).
+         attr(action_button(T,A),class,("btn-primary";"btn-sm")):-_any(action(T,A)), ctime(T).
 
          
          attr(action_button(T,empty(A)),class,("bg-opacity-50")):- agent_map(A), not action(T,explore(_,A)),
@@ -154,7 +154,6 @@ elem(ota_agent, container,w):- ctime(T),holds(T,env(escaped,_)).
          attr(action_button(T,explore((X,Y),(X,Y'))), icon, "fa-arrow-down") :- action(T,explore((X,Y),(X,Y'))), Y < Y'.     
 
          
-         attr(action_button(T,move_back(L,A)), class, ("bg-info";"bg-opacity-50")) :- _any(action(T,move_back(L,A))), ctime(T).         
          attr(action_button(T,move_back((X,Y),(X',Y))), icon, "fa-arrow-left") :- action(T,move_back((X,Y),(X',Y))), X > X'.     
          attr(action_button(T,move_back((X,Y),(X',Y))), icon, "fa-arrow-right") :- action(T,move_back((X,Y),(X',Y))), X < X'.  
          attr(action_button(T,move_back((X,Y),(X,Y'))), icon, "fa-arrow-up") :- action(T,move_back((X,Y),(X,Y'))), Y > Y'.     
@@ -309,55 +308,7 @@ elem(ota_agent, container,w):- ctime(T),holds(T,env(escaped,_)).
       when(action(T,A), click, call, (agent_action_semi(occurs(T,A)))) :- _any(action(T,A)), ctime(T), not holds(T,env(escaped,_)).  
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%% MESSAGES
-%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-elem(message_wumpus(W), message, info):- holds(T,env(wumpus_yell,W)), holds(T, in(agent(X))).
-      attr(message_wumpus(W), title, "You Killed the Wumpus!"):- holds(T,env(wumpus_yell,W)).
-      attr(message_wumpus(W), message, "Please Continue Exploring the Cave"):- holds(T,env(wumpus_yell,W)), not holds(T, carry_gold(_)).      
-      attr(message_wumpus(W), message, "Time to leave the cave"):- holds(T,env(wumpus_yell,W)), holds(T, carry_gold(_)).      
-      attr(message_wumpus(W), type, error):- holds(T,env(wumpus_yell,W)).
-      
-      
-      elem(message_sparke(S), message, ota_agent):- holds(T,env(sparkle,S)).
-      attr(message_sparke(S), title, "You found the Gold!"):- holds(T,env(sparkke,S)).
-      attr(message_sparke(S), message, "Congrats, you found the gold time to leave"):- holds(T,env(sparke,S)).      
-      attr(message_sparkle(S), type, error):- holds(T,env(sparkle,S)).
-      
-     elem(kw, container, w).
-         elem(wy(W,T),modal,kw) :- ctime(T),holds(T,env(wumpus_yell,W)).
-         attr(wy(W,T), title, "You have killed the Wumpus") :-  ctime(T),holds(T,env(wumpus_yell,W)).
-         attr(wy(W,T), size, "m") :- ctime(T),holds(T,env(wumpus_yell,W)).
-      
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      %%% DROPDOWN MENU 
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      
-
-
-      
-% when(dropdown(A), click, call, (agent_action(occurs(T,A)))) :- occurs(T,A), max_time(T).  
-
-% when(dropdown(A), click, call, set_constant("guitime", T+1)):- occurs(_,A), time(T+1), max_time(K), T <  K.
-
-
-
-% %when(dropdown(A), click, call, select) :- _any(occurs(T,A)), time(T).  
-% % when(dropdown(A), click, call, (select,update)) :- _any(occurs(T,A)), time(T).  
-
-
-%%%%%%%%%%%%%%%%%%%
-%%%%% GAME RESET 
-%%%%%%%%%%%%%%%%%%%
-   elem(restart(T), button, ota_agent):- ctime(T), holds(T,env(escaped,_)).
-        attr(restart(T), label, "restart game") :- ctime(T), holds(T,env(escaped,_)).
-        attr(restart(T), class, ("bg-warning";"m-2";"btn-sm")):-  ctime(T), holds(T,env(escaped,_)).   
-        attr(restart(T), icon, "fa-clock"):- ctime(T), holds(T,env(escaped,_)). 
-   
-        when(restart(T), click, call, (restart())) :- ctime(T), holds(_,env(escaped,_)).  
- 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 % Menu bar
@@ -365,28 +316,3 @@ elem(message_wumpus(W), message, info):- holds(T,env(wumpus_yell,W)), holds(T, i
 elem(menu_bar, menu_bar, w).
 attr(menu_bar, title, "Wumpus Observe Think Act Loop - Single Shot Variant").
 
-% attr(menu_bar, icon, "fa-table-cells").
-%      elem(menu_bar_prev, button, menu_bar):- time(T), time(T-1), T > 0.
-%      attr(menu_bar_prev, label, "Previous Time Step"):- time(T), time(T-1), T > 0.
-%      attr(menu_bar_prev, icon, "fa-backward-step"):- time(T), time(T-1), T > 0.
-
-% when(menu_bar_prev, click, call, set_constant("guitime", T-1)):- time(T), time(T-1), T > 0.
-
-%      elem(menu_bar_next, button, menu_bar). %:- time(T), time(T+1), max_time(K), T < K, T != K.
-%      attr(menu_bar_next, label, "Next Time Step"). %:- time(T), time(T+1), max_time(K), T < K, T != K. 
-%      attr(menu_bar_next, icon, "fa-forward-step"). %:- time(T), time(T+1),max_time(K), T < K, T != K.
-
-% when(menu_bar_next, click, call, set_constant("guitime", T+1)):- time(T), time(T+1), max_time(K), T < K.
-
-
-
-
-%% GRAVEYARD
-%%?????? Why keep?
-% %Hold believe that 
-% attr(agent(X,Y), class,("bg-success";"fa-solid";"fa-wind";"fa-2x")) :- holds(T,env(breeze,(X,Y))), time(T).
-        
-
-% when(occurs(T,A), click, call, set_constant("guitime", T+1)):- occurs(T,A), ctime(T), time(K), T <  K.
-       
- 

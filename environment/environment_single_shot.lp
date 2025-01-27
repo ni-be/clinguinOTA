@@ -1,4 +1,3 @@
-
 % Everything related to the environment itself.
 
 current_time(T) :- T = #max{T2 : time(T2)}.
@@ -77,7 +76,7 @@ holds(T, in(agent,A))          :- occurs(T-1, backtrack(L,A)),
 eholds(T,env(agent,L))         :- holds(T,in(agent,L)).
 
 %dummy to avoid warning!
-%occurs(-1000, dummy(-1000)).
+occurs(-1000, dummy(-1000)).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % THINK / UPDATE KNOWLEDGE
@@ -142,6 +141,8 @@ envholds(T, env(escaped,L)) :- occurs(T-1, escape(A,L)), current_time(T).
 gui(map(L)) :- map(L).
 
 #show envholds/2.
+#show holds/2.
+%#show eholds/2.
+%#show -eholds/2.
 #show gui/1.
-
 

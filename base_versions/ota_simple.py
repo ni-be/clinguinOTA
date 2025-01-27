@@ -3,12 +3,8 @@ Single Shot OTA Wumpus Implementation According to the AAA
 
 """
 
-import os
-import argparse
-import time as t
-from clingo import Control
 
-# ctl = Control()
+from clingo import Control
 
 AGENT_KNOWLEDGE = []
 CURRENT_LOCATION = []
@@ -16,16 +12,12 @@ ENV_KNOWLEDGE = []
 
 
 LOAD_ENV = [
-    # "instances/instance_small_no_env.lp",
-    # "instances/inst_move_check.lp",
-    "instances/instance_small_wumpus.lp",
-    # "instances/instance_med_wumpus_2pit.lp",
-    "single_shot/environment_b.lp",
+    "instances/instance_simple.lp",
+    "base_versions/environment.lp",
 ]
 LOAD_AGENT = [
-    "single_shot/agent.lp",
+    "base_versions/agent.lp",
 ]
-
 
 def agent_model(agent_m):
     for atom in agent_m.symbols(atoms=True):
@@ -97,19 +89,14 @@ def clinguin_export():
 def single_shot():
     time = 0
     horizon = 20
-
     exploring = True
-
-    while exploring:  # for the initial state
+    while exploring: 
         solver(time, "env", LOAD_ENV, AGENT_KNOWLEDGE)
         working_knowledge = AGENT_KNOWLEDGE + CURRENT_LOCATION
         solver(time, "agent", LOAD_AGENT, working_knowledge)
-
         print_debug(time)
-
         time += 1
         if time == horizon:
-            # later set to when gold was found
             exploring = False
 
     clinguin_export()
